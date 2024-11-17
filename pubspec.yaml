@@ -1,0 +1,67 @@
+name: biwah
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  firebase_core: ^3.2.0
+  firebase_auth: ^5.1.2
+  image_picker: ^1.1.2
+  cloud_firestore: ^5.1.0
+  firebase_storage: ^12.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1 # Add this line for flutter_launcher_icons
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo10e.png"
+  android_icon_size: "256"
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/logo10.png
+  android: true
+  ios: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/background_img.png
+    - assets/Logo Idea 6.png
+    - assets/logo10.png
+    - assets/logo10e.png
+    - assets/bgimg2.jpg
+    - assets/bgimg4.jpg
+    - assets/bgimg5.jpg
+    - assets/bgimg6.jpg
+    - assets/bgimg7.jpg
+    - assets/bgimg8.jpg
+    - assets/bgimg3.png
+    - assets/bridegroom1.png
+    - assets/bridegroom2.png
+
+  fonts:
+    - family: CustomFont1
+      fonts:
+        - asset: fonts/annabel.ttf
+          weight: 700
+    - family: CustomFont2
+      fonts:
+        - asset: fonts/Aurora.otf
+          weight: 700
+    - family: CustomFont3
+      fonts:
+        - asset: fonts/SAMAN.ttf
+          weight: 700

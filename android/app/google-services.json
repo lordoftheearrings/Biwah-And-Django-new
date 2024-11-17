@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676027575040",
+    "project_id": "biwah-bandhan-af0f6",
+    "storage_bucket": "biwah-bandhan-af0f6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676027575040:android:a29b70a79417f6840ae1e5",
+        "android_client_info": {
+          "package_name": "com.example.biwah"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDFSKaWDeLbq_Vu7dPevlx96PZSPh7gzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
