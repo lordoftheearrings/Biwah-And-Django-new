@@ -3,6 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'login_page.dart';
 import 'signup_page.dart';
 import 'home_page.dart';
+import 'notification_page.dart';
+import 'edit_profile_page.dart';
+import 'chat_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
