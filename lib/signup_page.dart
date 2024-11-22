@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'api_service.dart';
 import 'home_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -10,10 +9,9 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  String _email = '';
+  String _username = '';
   String _password = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiService apiService = ApiService();
   late AnimationController _controller;
   late Animation<double> _logoSizeAnimation;
   late Animation<double> _backgroundOpacityAnimation;
@@ -30,7 +28,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
       vsync: this,
     );
     _logoSizeAnimation = Tween<double>(begin: 200, end: 300).animate(_controller);
-    _backgroundOpacityAnimation = Tween<double>(begin: 0.3, end: 0.5).animate(_controller); // Decreased opacity
+    _backgroundOpacityAnimation = Tween<double>(begin: 0.2, end: 0.6).animate(_controller);
     _controller.forward();
   }
 
@@ -57,7 +55,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                   BlendMode.dstATop,
                 ),
                 child: Image.asset(
-                  'assets/bgimg8.jpg', // Path to your background image
+                  'assets/bgimg11.jpg', // Path to your background image
                   fit: BoxFit.cover,
                 ),
               );
@@ -88,20 +86,20 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                         children: <Widget>[
                           TextFormField(
                             decoration: InputDecoration(
-                              labelText: 'Email',
+                              labelText: 'Username',
                               border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.email),
+                              prefixIcon: Icon(Icons.person),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.8),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
+                                return 'Please enter your username';
                               }
                               return null;
                             },
                             onSaved: (value) {
-                              _email = value!;
+                              _username = value!;
                             },
                           ),
                           SizedBox(height: 20),
@@ -166,30 +164,21 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                             },
                             obscureText: _obscureTextConfirmPassword,
                           ),
-                          SizedBox(height: 20),
+                          SizedBox(height: 40),
                           ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
                                 try {
-                                  UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-                                    email: _email,
-                                    password: _password,
-                                  );
-                                  await _firestore.collection('users').doc(userCredential.user!.uid).set({
-                                    'email': _email,
-                                  });
-                                  // Navigate to the HomePage
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => HomePage(email: _email),
-                                    ),
-                                  );
+                                  await apiService.registerUser(_username, _password);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => HomePage(username: _username),
+                                  ));
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'Already registered email. Please try again.',
+                                        'Failed to register user. Please try again.',
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       backgroundColor: Colors.black45,
@@ -206,7 +195,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.pinkAccent,
+                              backgroundColor: Color.fromRGBO(153, 0, 76, 1),
                               padding: EdgeInsets.symmetric(
                                 horizontal: MediaQuery.of(context).size.width * 0.2,
                                 vertical: 15,
@@ -216,21 +205,16 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                               ),
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Divider(
-                            color: Colors.pink,
-                            thickness: 1,
-                            indent: 50,
-                            endIndent: 50,
-                          ),
+                          SizedBox(height: 20),
+                          Divider(color: Colors.pink, thickness: 1, indent: 50, endIndent: 50),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/');
                             },
                             child: Text(
                               'Already have an account? Log In',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 16,
                               ),
                             ),

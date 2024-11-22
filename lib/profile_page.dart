@@ -1,153 +1,255 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'edit_profile_page.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'api_service.dart'; // Import your ApiService
+import 'edit_profile_page.dart'; // Import EditProfilePage
+import 'app_settings.dart';
+import 'image_button.dart'; // Import the image_buttons.dart file
 
 class ProfilePage extends StatefulWidget {
-  final String email;
+  final String username;
 
-  ProfilePage({required this.email});
+  ProfilePage({required this.username});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final _formKey = GlobalKey<FormState>();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ImagePicker _picker = ImagePicker();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  String _name = '';
-  String _phoneNumber = '';
-  String _age = '';
-  String _gender = 'Male';
-  String _religion = '';
-  String _caste = '';
-  String _bio = '';
-  String _errorMessage = '';
-  String? _profileImageUrl;
-  File? _profileImage;
-
-  final List<String> _genders = ['Male', 'Female', 'Other'];
-  bool _isProfileExisting = false;
-  bool _isLoading = true;
+  late Future<Map<String, dynamic>?> _profileDataFuture;
+  bool _isExpanded = false; // To track the expanded state
 
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    _fetchProfileData(); // Load profile data initially
   }
 
-  Future<void> _loadProfile() async {
-    try {
-      DocumentSnapshot profile = await _firestore.collection('users').doc(widget.email).get();
-      if (profile.exists) {
-        setState(() {
-          _isProfileExisting = true;
-          _name = profile['name'];
-          _phoneNumber = profile['phoneNumber'];
-          _age = profile['age'];
-          _gender = profile['gender'];
-          _religion = profile['religion'];
-          _caste = profile['caste'];
-          _bio = profile['bio'];
-          _profileImageUrl = profile['profileImage'];
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _isProfileExisting = false;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load profile.';
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _pickProfileImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<String> _uploadProfileImage(File image) async {
-    try {
-      String fileName = '${widget.email}.jpg';
-      UploadTask uploadTask = _storage.ref().child('profile_images/$fileName').putFile(image);
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      return downloadUrl;
-    } catch (e) {
-      throw Exception('Failed to upload image');
-    }
-  }
-
-  Future<void> _saveProfile() async {
+  void _fetchProfileData() {
     setState(() {
-      _errorMessage = '';
+      _profileDataFuture = ApiService().loadProfile(widget.username);
     });
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      try {
-        if (_profileImage != null) {
-          _profileImageUrl = await _uploadProfileImage(_profileImage!);
-        }
-        Map<String, dynamic> profileData = {
-          'name': _name,
-          'phoneNumber': _phoneNumber,
-          'age': _age,
-          'gender': _gender,
-          'religion': _religion,
-          'caste': _caste,
-          'bio': _bio,
-          'profileImage': _profileImageUrl,
-        };
-        await _firestore.collection('users').doc(widget.email).set(profileData);
-        setState(() {
-          _isProfileExisting = true;
-        });
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'Profile update failed. Please try again.';
-        });
-      }
-    }
   }
 
-  void _confirmLogout() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Logout'),
-        content: Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+  String _getFieldValue(Map<String, dynamic>? data, String field) {
+    if (data == null || data[field] == null || data[field].toString().isEmpty) {
+      return 'Not provided';
+    }
+    return data[field].toString();
+  }
+
+  Widget _buildProfileView(BuildContext context, Map<String, dynamic> profileData) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Cover Image with Gradient Overlay
+          Stack(
+            children: [
+              // Cover Image
+              Container(
+                height: MediaQuery.of(context).size.height * 0.50, // Cover Image takes 50% height
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: profileData['cover_image'] != null
+                        ? NetworkImage(profileData['cover_image'])
+                        : AssetImage('assets/default_cover.jpg') as ImageProvider,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              // Gradient Overlay
+              Container(
+                height: MediaQuery.of(context).size.height * 0.50,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromRGBO(153, 0, 76, 1), // Same color as AppBar background
+                      Colors.transparent
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                ),
+              ),
+              // Profile Image, Name, and Username inside cover image
+              Positioned(
+                bottom: 10,
+                left: 20,
+                child: Row(
+                  children: [
+                    // Profile Image (larger size)
+                    CircleAvatar(
+                      radius: 65, // Larger size
+                      backgroundColor: Colors.white,
+                      backgroundImage: profileData['profile_image'] != null
+                          ? NetworkImage(profileData['profile_image'])
+                          : AssetImage('assets/default_profile.png') as ImageProvider,
+                    ),
+                    SizedBox(width: 16),
+                    // Name and Username
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getFieldValue(profileData, 'name'),
+                          style: TextStyle(fontFamily: 'CustomFont2', color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '@ ${widget.username}',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              try {
-                Navigator.pop(context);
-                await _auth.signOut();
-                Navigator.pushReplacementNamed(context, '/login');
-              } catch (e) {
-                print('Error logging out: $e');
-              }
-            },
-            child: Text('Logout'),
+          // Profile Info Section with Expandable Card
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: _buildExpandableInfoCard(profileData),
+          ),
+          SizedBox(height: 20),
+          // Image Buttons Row at the bottom
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: KundaliImageButton(
+                    onPressed: () {
+                      print('Kundali button pressed!');
+                    },
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: AshtakootMilanImageButton(
+                    onPressed: () {
+                      print('Ashtakoot Milan button pressed!');
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Method to build an expandable card for profile info
+  Widget _buildExpandableInfoCard(Map<String, dynamic> profileData) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 4,
+      color: Color.fromRGBO(153, 0, 76, 1),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            // Title: Details with arrow on the right side
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Details',
+                  style: TextStyle(color: Colors.white, fontFamily: 'CustomFont2', fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: Icon(
+                    _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                    color: Colors.pinkAccent,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded; // Toggle the expanded state
+                    });
+                  },
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            // Always visible: First row with 2 pieces of information
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildInfoColumn('Age', _getFieldValue(profileData, 'age')),
+                _buildInfoColumn('Gender', _getFieldValue(profileData, 'gender')),
+
+              ],
+            ),
+            SizedBox(height: 16),
+            // If expanded, show other information
+            if (_isExpanded) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildInfoColumn('Bio', _getFieldValue(profileData, 'bio')),
+                  _buildInfoColumn('Phone', _getFieldValue(profileData, 'phone_number')),
+
+                ],
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildInfoColumn('Religion', _getFieldValue(profileData, 'religion')),
+                  _buildInfoColumn('Caste', _getFieldValue(profileData, 'caste')),
+
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build each info column in 1x2 format
+  Widget _buildInfoColumn(String label, String value) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'CustomFont2', // Font family set to CustomFont2
+              fontWeight: FontWeight.bold,
+              fontSize: 14, // Adjust font size as needed
+              color: Colors.white, // Text color set to white
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white, // Text color set to white
+              fontSize: 16, // Adjust font size as needed
+            ),
           ),
         ],
       ),
@@ -156,215 +258,60 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Loading...'),
-          backgroundColor: Colors.black,
-        ),
-        body: Center(child: CircularProgressIndicator()),
-        backgroundColor: Colors.black,
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(_name.isNotEmpty ? _name : 'Profile', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        backgroundColor: Color(0xFF9C004C),
+        automaticallyImplyLeading: false,
+        title: Text(
+          '${widget.username}',
+          style: TextStyle(
+            fontSize: 28,
+            fontFamily: 'CustomFont2',
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Color.fromRGBO(153, 0, 76, 1),
         actions: [
+          // Edit Profile button to the left of settings icon
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: Icon(Icons.edit, color: Colors.white),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfilePage(username: widget.username),
+                ),
+              );
+              _fetchProfileData(); // Refresh data
+            },
+          ),
+          // Settings Icon
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditProfilePage(email: widget.email)),
+                MaterialPageRoute(builder: (context) => AppSettings(username: widget.username)),
               );
             },
           ),
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _confirmLogout,
-          ),
-        ],
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _isProfileExisting ? _buildProfileView() : _buildProfileForm(),
-      ),
-      backgroundColor: Color(0xFF121212),
-    );
-  }
-
-  Widget _buildProfileView() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Profile Image Section with Shadow and Border
-          Center(
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _pickProfileImage, // When clicked, it opens the image picker
-                  child: CircleAvatar(
-                    radius: 90,
-                    backgroundImage: _profileImageUrl != null
-                        ? NetworkImage(_profileImageUrl!)
-                        : null,
-                    backgroundColor: Colors.transparent,
-                    child: _profileImageUrl == null
-                        ? Icon(Icons.add_a_photo, color: Colors.white, size: 40)
-                        : null,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  _name,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  _bio,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.grey[400]),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 32),
-          Divider(color: Colors.grey, thickness: 0.5),
-          // Profile Information Cards
-          _buildProfileInfoCard('Phone Number', _phoneNumber),
-          _buildProfileInfoCard('Age', _age),
-          _buildProfileInfoCard('Gender', _gender),
-          _buildProfileInfoCard('Religion', _religion),
-          _buildProfileInfoCard('Caste', _caste),
         ],
       ),
-    );
-  }
+      body: FutureBuilder<Map<String, dynamic>?>( // Use FutureBuilder to load profile data
+        future: _profileDataFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error loading profile.'));
+          }
 
-  Widget _buildProfileForm() {
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            if (_errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  _errorMessage,
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            // Profile Image Picker with a Circular Border
-            GestureDetector(
-              onTap: _pickProfileImage,
-              child: CircleAvatar(
-                radius: 90,
-                backgroundImage: _profileImage != null
-                    ? FileImage(_profileImage!)
-                    : null,
-                child: _profileImage == null
-                    ? Icon(Icons.add_a_photo, color: Colors.white)
-                    : null,
-                backgroundColor: Color(0xFF9C004C),
-              ),
-            ),
-            SizedBox(height: 20),
-            _buildTextFormField('Name', _name, (value) => _name = value!),
-            _buildTextFormField('Phone Number', _phoneNumber, (value) => _phoneNumber = value!),
-            _buildTextFormField('Age', _age, (value) => _age = value!),
-            _buildDropdownField('Gender', _gender, (value) => _gender = value!),
-            _buildTextFormField('Religion', _religion, (value) => _religion = value!),
-            _buildTextFormField('Caste', _caste, (value) => _caste = value!),
-            _buildTextFormField('Bio', _bio, (value) => _bio = value!),
-            SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _saveProfile,
-              child: Text('Save Profile'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF9C004C),
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextFormField(String label, String initialValue, Function(String?) onSave) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: Colors.grey),
-          filled: true,
-          fillColor: Color(0xFF1C1C1C),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        initialValue: initialValue,
-        onSaved: onSave,
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _buildDropdownField(String label, String value, Function(String?) onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: DropdownButtonFormField<String>(
-        value: value,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: Colors.grey),
-          filled: true,
-          fillColor: Color(0xFF1C1C1C),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        items: _genders.map((String gender) {
-          return DropdownMenuItem<String>(
-            value: gender,
-            child: Text(gender),
-          );
-        }).toList(),
-        onChanged: onChanged,
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _buildProfileInfoCard(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Card(
-        color: Color(0xFF1C1C1C),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$label:',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                value,
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-        ),
+          final profileData = snapshot.data;
+          if (profileData == null || profileData.isEmpty) {
+            return Center(child: Text('No profile found!'));
+          }
+          return _buildProfileView(context, profileData);
+        },
       ),
     );
   }

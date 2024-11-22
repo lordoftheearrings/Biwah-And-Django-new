@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'home_page.dart';
+import 'api_service.dart'; // Assuming this service handles API calls
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,14 +9,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  String _email = '';
+  String _username = '';
   String _password = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final ApiService apiService = ApiService();
   late AnimationController _controller;
   late Animation<double> _logoSizeAnimation;
   late Animation<double> _backgroundOpacityAnimation;
-  bool _isInitialized = false;
   bool _obscureText = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -24,15 +24,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
-    )..addListener(() {
-      if (_controller.isCompleted) {
-        setState(() {
-          _isInitialized = true;
-        });
-      }
-    });
+    );
     _logoSizeAnimation = Tween<double>(begin: 200, end: 300).animate(_controller);
-    _backgroundOpacityAnimation = Tween<double>(begin: 0.5, end: 0.8).animate(_controller);
+    _backgroundOpacityAnimation = Tween<double>(begin: 0.3, end: 0.6).animate(_controller);
     _controller.forward();
   }
 
@@ -42,14 +36,62 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
+  // Login function with error handling and loading state
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      _formKey.currentState!.save();
+      try {
+        // Call the backend login API
+        bool loginSuccessful = await apiService.loginUser(_username, _password);
+
+        if (loginSuccessful) {
+          // Navigate to HomePage if login successful
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => HomePage(username: _username),
+            ),
+          );
+        } else {
+          // Show error if login failed
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Login failed! Please check your credentials.',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+      } catch (e) {
+        // Show error if an exception occurs
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'An error occurred. Please try again.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          _isInitialized
-              ? AnimatedBuilder(
+          AnimatedBuilder(
             animation: _backgroundOpacityAnimation,
             builder: (context, child) {
               return ColorFiltered(
@@ -58,33 +100,30 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   BlendMode.dstATop,
                 ),
                 child: Image.asset(
-                  'assets/bgimg7.jpg', // Path to your background image
+                  'assets/bgimg10.jpg', // Background image
                   fit: BoxFit.cover,
                 ),
               );
             },
-          )
-              : Container(),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: SingleChildScrollView(
                 child: Column(
-                  children: <Widget>[
-                    _isInitialized
-                        ? AnimatedBuilder(
+                  children: [
+                    AnimatedBuilder(
                       animation: _logoSizeAnimation,
                       builder: (context, child) {
                         return SizedBox(
                           height: _logoSizeAnimation.value,
                           child: Image.asset(
-                            'assets/logo10e.png', // Path to your logo
+                            'assets/logo10e.png', // App logo
                             fit: BoxFit.contain,
                           ),
                         );
                       },
-                    )
-                        : Container(),
+                    ),
                     SizedBox(height: 20),
                     Text(
                       'Biwah BandhaN',
@@ -99,26 +138,28 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     Form(
                       key: _formKey,
                       child: Column(
-                        children: <Widget>[
+                        children: [
+                          // Username Field
                           TextFormField(
                             decoration: InputDecoration(
-                              labelText: 'Email',
+                              labelText: 'Username',
                               border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.email),
+                              prefixIcon: Icon(Icons.person),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.8),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
+                                return 'Please enter your username';
                               }
                               return null;
                             },
                             onSaved: (value) {
-                              _email = value!;
+                              _username = value!;
                             },
                           ),
                           SizedBox(height: 20),
+                          // Password Field
                           TextFormField(
                             decoration: InputDecoration(
                               labelText: 'Password',
@@ -149,45 +190,20 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             obscureText: _obscureText,
                           ),
                           SizedBox(height: 20),
+                          // Login Button
                           ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                try {
-                                  UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-                                    email: _email,
-                                    password: _password,
-                                  );
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (context) => HomePage(email: _email),
-                                    ),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Login failed! Recheck your credentials and try again.',
-                                        style: TextStyle(color: Colors.white), // Set the text color to white
-                                      ),
-                                      backgroundColor: Colors.black45, // Set the background color to red
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            child: Text(
+                            onPressed: _isLoading ? null : _login,
+                            child: _isLoading
+                                ? CircularProgressIndicator(color: Colors.white)
+                                : Text(
                               'Login',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20, // Increase the font size of the text
-                              ),
+                              style: TextStyle(fontSize: 20, color: Colors.white),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.pinkAccent,
+                              backgroundColor: Color.fromRGBO(153, 0, 76, 1),
                               padding: EdgeInsets.symmetric(
                                 horizontal: MediaQuery.of(context).size.width * 0.2,
-                                vertical: 15, // Increase the vertical padding of the button
+                                vertical: 15,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
@@ -195,22 +211,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ),
                           ),
                           SizedBox(height: 10),
-                          Divider(
-                            color: Colors.pink,
-                            thickness: 1,
-                            indent: 50,
-                            endIndent: 50,
-                          ),
+                          Divider(color: Colors.pink, thickness: 1, indent: 50, endIndent: 50),
+                          // Sign Up Button
                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/sign_up');
                             },
                             child: Text(
                               'Don\'t have an account? Sign Up',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16, // Increase the font size of the text
-                              ),
+                              style: TextStyle(color: Colors.white, fontSize: 16),
                             ),
                           ),
                         ],

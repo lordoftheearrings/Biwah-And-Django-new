@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         '/sign_up': (context) => SignUpPage(),
-        '/home': (context) => HomePage(email: ModalRoute.of(context)!.settings.arguments as String),
+        '/home': (context) => HomePage(username: ModalRoute.of(context)!.settings.arguments as String),
       },
     );
   }

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart'; // Import image_picker package
+import 'api_service.dart'; // Import your ApiService
+import 'dart:io'; // For handling file picking
+import 'dart:typed_data'; // For handling binary data
 
 class EditProfilePage extends StatefulWidget {
-  final String email;
+  final String username;
 
-  EditProfilePage({required this.email});
+  EditProfilePage({required this.username});
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -15,286 +15,314 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ImagePicker _picker = ImagePicker();
-
   String _name = '';
   String _phoneNumber = '';
   String _age = '';
-  String _gender = 'Male';
-  String _religion = '';
+  String _gender = 'Male'; // Default gender value
   String _bio = '';
-  File? _profileImage;
-
-  final List<String> _genders = ['Male', 'Female', 'Other'];
   bool _isLoading = false;
+
+  // Image data
+  File? _profileImage;
+  File? _coverImage;
 
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    _loadExistingProfile();
   }
 
-  Future<void> _loadProfile() async {
+  // Load existing profile data if available
+  Future<void> _loadExistingProfile() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Set loading state to true
     });
 
     try {
-      DocumentSnapshot profile = await _firestore.collection('users').doc(widget.email).get();
-      if (profile.exists) {
+      final profileData = await ApiService().loadProfile(widget.username);
+      if (profileData != null) {
         setState(() {
-          _name = profile['name'];
-          _phoneNumber = profile['phoneNumber'];
-          _age = profile['age'];
-          _gender = profile['gender'];
-          _religion = profile['religion'];
-          _bio = profile['bio'];
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
+          _name = profileData['name'] ?? '';
+          _phoneNumber = profileData['phone_number']?.toString() ?? '';  // Ensure the number is a string
+          _age = profileData['age']?.toString() ?? ''; // Ensure age is a string
+          _gender = ['Male', 'Female', 'Other'].contains(profileData['gender'])
+              ? profileData['gender']
+              : 'Male'; // Default to 'Male' if the gender is invalid
+          _bio = profileData['bio'] ?? '';
         });
       }
     } catch (e) {
+      print('Error loading profile for editing: $e');
+    } finally {
       setState(() {
-        _isLoading = false;
-      });
-      print('Error loading profile: $e');
-    }
-  }
-
-  Future<void> _pickProfileImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
+        _isLoading = false; // Set loading state to false after fetching data
       });
     }
   }
 
-  Future<String> _uploadProfileImage(File image) async {
-    try {
-      String fileName = '${widget.email}_profile.jpg';
-      UploadTask uploadTask = _storage.ref().child('profile_images/$fileName').putFile(image);
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      return downloadUrl;
-    } catch (e) {
-      throw Exception('Failed to upload image');
-    }
-  }
-
+  // Save or update the profile data
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
       setState(() {
         _isLoading = true;
       });
 
-      try {
-        String? profileImageUrl;
+      // Prepare profile data without images
+      Map<String, dynamic> profileData = {
+        'name': _name,
+        'phone_number': int.tryParse(_phoneNumber) ?? 0,
+        'age': int.tryParse(_age) ?? 0,
+        'gender': _gender,
+        'bio': _bio,
+      };
 
-        // If a new image is selected, upload it and get the URL
-        if (_profileImage != null) {
-          profileImageUrl = await _uploadProfileImage(_profileImage!);
-        }
+      // Update profile with optional images
+      bool success = await ApiService().updateProfileWithOptionalImages(
+        username: widget.username,
+        profileData: profileData,
+        profileImageSource: _profileImage, // Pass the actual image file (File?)
+        coverImageSource: _coverImage,     // Pass the actual image file (File?)
+      );
 
-        Map<String, dynamic> profileData = {
-          'name': _name,
-          'phoneNumber': _phoneNumber,
-          'age': _age,
-          'gender': _gender,
-          'religion': _religion,
-          'bio': _bio,
-          'profileImage': profileImageUrl ?? '',
-        };
+      setState(() {
+        _isLoading = false;
+      });
 
-        await _firestore.collection('users').doc(widget.email).update(profileData);
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        Navigator.pop(context);
-      } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
-        print('Error saving profile: $e');
+      if (success) {
+        Navigator.pop(context); // Go back to Profile Page
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save profile')),
+        );
       }
+    }
+  }
+
+  // Pick image using ImagePicker
+  Future<void> _pickImage(bool isProfileImage) async {
+    // Don't pick image if it's already selected
+    if ((isProfileImage && _profileImage != null) || (!isProfileImage && _coverImage != null)) {
+      return; // Exit if an image is already selected
+    }
+
+    final ImagePicker picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        if (isProfileImage) {
+          _profileImage = File(pickedFile.path);
+        } else {
+          _coverImage = File(pickedFile.path);
+        }
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Edit Profile'),
-        ),
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
+      backgroundColor: Color.fromRGBO(68, 29, 47, 1.0), // Set background color to black
       appBar: AppBar(
-        title: Text('Edit Profile'),
-        backgroundColor: Color(0xFF9C004C),
+        leading: IconButton(  // Add back button
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);  // Go back to previous page
+          },
+        ),
+        title: Text(
+          'Edit Profile',
+          style: TextStyle(
+            fontFamily: 'CustomFont3', // Add custom font if needed
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Color.fromRGBO(153, 0, 76, 1),
+        elevation: 5,
+        actions: [
+          ElevatedButton(
+            onPressed: _saveProfile,
+            child: Text('Save', style: TextStyle(fontWeight:FontWeight.bold,fontSize: 15, color: Colors.black)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color.fromRGBO(255, 182, 193, 1),
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: 10,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+          ),
+          SizedBox(width: 10), // Add some space to the right of the button
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: Colors.white))
+          : SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _pickProfileImage,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Image Picker
+              Text('Profile Image', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              Center(
+                child: GestureDetector(
+                  onTap: () => _pickImage(true),
+
                   child: CircleAvatar(
-                    radius: 70,
+
+                    radius: 75,
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
                         : null,
+
                     child: _profileImage == null
-                        ? Icon(Icons.add_a_photo, color: Colors.white)
+                        ? Icon(Icons.photo_camera_back, size: 50, color: Colors.grey)
                         : null,
-                    backgroundColor: Color(0xFF9C004C),
                   ),
                 ),
-                SizedBox(height: 16),
-                TextFormField(
-                  initialValue: _name,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Color(0xFF1C1C1C),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              SizedBox(height: 25),
+
+              // Cover Image Picker
+              Text('Cover Image', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              SizedBox(height: 15),
+              GestureDetector(
+                onTap: () => _pickImage(false),
+                child: Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[350],
+                    borderRadius: BorderRadius.circular(5),
+                    image: _coverImage != null
+                        ? DecorationImage(
+                      image: FileImage(_coverImage!),
+                      fit: BoxFit.cover,
+                    )
+                        : null,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _name = value!;
-                  },
-                  style: TextStyle(color: Colors.white),
+                  child: _coverImage == null
+                      ? Center(child: Icon(Icons.photo_camera_back, size: 50, color: Colors.grey))
+                      : null,
                 ),
-                SizedBox(height: 16),
-                TextFormField(
-                  initialValue: _phoneNumber,
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Color(0xFF1C1C1C),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              SizedBox(height: 20),
+
+              // Name Field
+              TextFormField(
+                initialValue: _name,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _phoneNumber = value!;
-                  },
-                  style: TextStyle(color: Colors.white),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  initialValue: _age,
-                  decoration: InputDecoration(
-                    labelText: 'Age',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Color(0xFF1C1C1C),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your age';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _age = value!;
-                  },
-                  style: TextStyle(color: Colors.white),
-                ),
-                SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _gender,
-                  items: _genders
-                      .map((gender) => DropdownMenuItem(
-                    value: gender,
-                    child: Text(gender),
-                  ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _gender = value!;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Gender',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Color(0xFF1C1C1C),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  style: TextStyle(color: Colors.white),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  initialValue: _religion,
-                  decoration: InputDecoration(
-                    labelText: 'Religion',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Color(0xFF1C1C1C),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onSaved: (value) {
-                    _religion = value!;
-                  },
-                  style: TextStyle(color: Colors.white),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  initialValue: _bio,
-                  decoration: InputDecoration(
-                    labelText: 'Bio',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Color(0xFF1C1C1C),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onSaved: (value) {
-                    _bio = value!;
-                  },
-                  style: TextStyle(color: Colors.white),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _saveProfile,
-                  child: Text('Save Profile'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF9C004C),
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
                   ),
                 ),
-              ],
-            ),
+                style: TextStyle(color: Colors.white),
+                validator: (value) => value!.isEmpty ? 'Please enter your name' : null,
+                onSaved: (value) => _name = value!,
+              ),
+              SizedBox(height: 16),
+
+              // Phone Number Field
+              TextFormField(
+                initialValue: _phoneNumber,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+                keyboardType: TextInputType.number,
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter your phone number' : null,
+                onSaved: (value) => _phoneNumber = value!,
+              ),
+              SizedBox(height: 16),
+
+              // Age Field
+              TextFormField(
+                initialValue: _age,
+                decoration: InputDecoration(
+                  labelText: 'Age',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+                keyboardType: TextInputType.number,
+                validator: (value) => value!.isEmpty ? 'Please enter your age' : null,
+                onSaved: (value) => _age = value!,
+              ),
+              SizedBox(height: 16),
+
+              // Gender Dropdown
+              DropdownButtonFormField<String>(
+                value: _gender,
+                decoration: InputDecoration(
+                  labelText: 'Gender',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+                dropdownColor: Colors.black,
+                style: TextStyle(color: Colors.white),
+                onChanged: (newValue) {
+                  setState(() {
+                    _gender = newValue!;
+                  });
+                },
+                items: ['Male', 'Female', 'Other']
+                    .map((gender) => DropdownMenuItem(
+                  value: gender,
+                  child: Text(gender, style: TextStyle(color: Colors.white)),
+                ))
+                    .toList(),
+              ),
+              SizedBox(height: 16),
+
+              // Bio Field
+              TextFormField(
+                initialValue: _bio,
+                decoration: InputDecoration(
+                  labelText: 'Bio',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+                maxLines: 3,
+                onSaved: (value) => _bio = value!,
+              ),
+              SizedBox(height: 20),
+            ],
           ),
         ),
       ),

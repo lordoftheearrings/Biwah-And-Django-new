@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'profile_page.dart';
-import 'search_page.dart';
-import 'messages_page.dart';
-import 'notification_page.dart';
+import 'profile_page.dart'; // Import the Profile Page
+import 'search_page.dart'; // Import the Search Page
+import 'messages_page.dart'; // Import the Messages Page
+import 'notification_page.dart'; // Import the Notification Page
+import 'view_user.dart'; // Import the User Page for individual user profiles
 
 class HomePage extends StatefulWidget {
-  final String email;
+  final String username;
 
-  HomePage({required this.email});
+  HomePage({required this.username});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -18,33 +19,14 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> _widgetOptions = <Widget>[];
 
-  // Demo data (Mock data simulating PostgreSQL entries)
   List<Map<String, dynamic>> profiles = List.generate(15, (index) {
     return {
       'name': 'User ${index + 1}',
+      'age': 20 + index,
       'bio': 'Bio for User ${index + 1}',
       'avatar': 'https://via.placeholder.com/150', // Placeholder image URL
     };
   });
-
-  List<Map<String, dynamic>> posts = [
-    {
-      'user_id': 'User 1',
-      'content': 'Just completed a new coding project! 🚀',
-      'timestamp': '10:30 AM',
-    },
-    {
-      'user_id': 'User 2',
-      'content': 'Had an amazing workout today! 💪',
-      'timestamp': '9:00 AM',
-    },
-    {
-      'user_id': 'User 3',
-      'content': 'Finally beat my favorite game! 🎮',
-      'timestamp': '8:15 AM',
-    },
-    // Add more demo posts here
-  ];
 
   bool isLoading = false;
 
@@ -55,7 +37,7 @@ class _HomePageState extends State<HomePage> {
       _buildHomePage(),
       MessagesPage(),
       NotificationPage(),
-      ProfilePage(email: widget.email),
+      ProfilePage(username: widget.username), // Pass the email correctly
     ];
   }
 
@@ -68,6 +50,7 @@ class _HomePageState extends State<HomePage> {
   PreferredSizeWidget? _getAppBar() {
     if (_selectedIndex == 0) {
       return AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           'Biwah Bandhan',
           style: TextStyle(
@@ -81,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         elevation: 4,
         actions: [
           IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: Icon(Icons.search_rounded, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
@@ -102,28 +85,30 @@ class _HomePageState extends State<HomePage> {
       appBar: _getAppBar(),
       body: Center(
         child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _widgetOptions.elementAt(_selectedIndex),
+            ? CircularProgressIndicator()
+            : (_selectedIndex >= 0 && _selectedIndex < _widgetOptions.length)
+            ? _widgetOptions[_selectedIndex]
+            : Center(child: Text('Invalid Page Index!')),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_filled),
             label: 'Home',
             backgroundColor: Colors.pink,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.message),
+            icon: Icon(Icons.message_outlined),
             label: 'Messages',
             backgroundColor: Colors.green,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
+            icon: Icon(Icons.notifications_none_rounded),
             label: 'Notifications',
             backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person_outline_outlined),
             label: 'Profile',
             backgroundColor: Colors.orange,
           ),
@@ -147,108 +132,118 @@ class _HomePageState extends State<HomePage> {
           var profile = profiles[index];
           return _buildProfileCard(profile, index);
         },
-        scrollDirection: Axis.vertical, // Scroll vertically for TikTok-style swiping
+        scrollDirection: Axis.vertical,
       ),
     );
   }
 
   Widget _buildProfileCard(Map<String, dynamic> profile, int index) {
-    // Filter posts based on the user_id
-    var profilePosts = posts.where((post) => post['user_id'] == profile['name']).toList();
-
-    return GestureDetector(
-      onVerticalDragUpdate: (details) {
-        // Handle swipe up and down
-        if (details.primaryDelta! > 0) {
-          // Swipe Down (you can add functionality here)
-          print('Swiped Down');
-        } else if (details.primaryDelta! < 0) {
-          // Swipe Up (you can add functionality here)
-          print('Swiped Up');
-        }
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage(profile['avatar']!),
-            fit: BoxFit.cover,
+    return Stack(
+      children: [
+        // Cover image as background
+        Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(profile['avatar']),
+              fit: BoxFit.cover,
+            ),
           ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.7),
-              offset: Offset(0, 10),
-              blurRadius: 30,
-            ),
-          ],
+          height: double.infinity,
+          width: double.infinity,
         ),
-        child: Column(
-          children: [
-            Text(
-              profile['name']!,
-              style: TextStyle(
-                fontSize: 32,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+        // Gradient overlay for readability
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
             ),
-            SizedBox(height: 10),
-            Text(
-              profile['bio']!,
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white70,
-              ),
-            ),
-            SizedBox(height: 15),
-            ElevatedButton(
-              onPressed: () {
-                // Add follow action
-              },
-              child: Text("Follow"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.pink,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        // Profile details
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Profile information on the left
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Circular profile picture
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: NetworkImage(profile['avatar']),
+                      backgroundColor: Colors.white,
+                    ),
+                    SizedBox(height: 10),
+                    // Username (Clickable)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewUser(
+                              name: profile['name'],
+                              age: profile['age'],
+                              bio: profile['bio'],
+                              avatar: profile['avatar'],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        profile['name'],
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    // Age field
+                    Text(
+                      'Age: ${profile['age']}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
                 ),
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               ),
-            ),
-            SizedBox(height: 15),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: profilePosts.length,
-              itemBuilder: (context, postIndex) {
-                return Card(
-                  color: Colors.grey[900],
-                  child: ListTile(
-                    title: Text(
-                      profilePosts[postIndex]['content'],
-                      style: TextStyle(color: Colors.white),
+              // Follow button on the right
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Add follow action
+                  },
+                  child: Text("Follow"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    subtitle: Text(
-                      profilePosts[postIndex]['timestamp'],
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    trailing: Icon(
-                      Icons.favorite_border,
-                      color: Colors.white,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
-                );
-              },
-            ),
-          ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
 
-void main() => runApp(MaterialApp(
-  home: HomePage(email: 'example@example.com'), // Replace with actual email
-));
+// void main() => runApp(MaterialApp(
+//   home: HomePage(username: ''), // Replace with actual email
+// ));

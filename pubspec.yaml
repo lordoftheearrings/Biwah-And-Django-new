@@ -1,4 +1,4 @@
-name: biwah
+name: biwah_bandhan
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -16,6 +16,8 @@ dependencies:
   image_picker: ^1.1.2
   cloud_firestore: ^5.1.0
   firebase_storage: ^12.1.1
+  http: ^0.13.3
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -26,12 +28,12 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logo10e.png"
-  android_icon_size: "256"
+  image_path: "assets/logof.png"
+  android_icon_size: "512"
 
 flutter_native_splash:
-  color: "#ffffff"
-  image: assets/logo10.png
+  color: Color.fromRGBO(234, 154, 164, 1.0)
+  image: assets/logof.png
   android: true
   ios: true
 
@@ -49,6 +51,12 @@ flutter:
     - assets/bgimg7.jpg
     - assets/bgimg8.jpg
     - assets/bgimg3.png
+    - assets/bgimg9.jpg
+    - assets/bgimg10.jpg
+    - assets/bgimg11.jpg
+    - assets/logof.png
+    - assets/kundali_icon.png
+    - assets/kundali.png
     - assets/bridegroom1.png
     - assets/bridegroom2.png
 

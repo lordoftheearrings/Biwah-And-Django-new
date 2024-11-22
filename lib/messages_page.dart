@@ -26,7 +26,9 @@ class MessagesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(68, 29, 47, 1.0),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           'Messages',
           style: TextStyle(
