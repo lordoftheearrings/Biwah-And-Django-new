@@ -7,8 +7,8 @@ class KundaliImageButton extends StatelessWidget {
 
   KundaliImageButton({
     required this.onPressed,
-    this.width = 100,
-    this.height = 100,
+    this.width = 150,
+    this.height = 150,
   });
 
   @override
@@ -31,8 +31,8 @@ class AshtakootMilanImageButton extends StatelessWidget {
 
   AshtakootMilanImageButton({
     required this.onPressed,
-    this.width = 100,
-    this.height = 100,
+    this.width = 150,
+    this.height = 150,
   });
 
   @override

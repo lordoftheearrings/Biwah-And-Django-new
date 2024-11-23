@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'profile_page.dart'; // Import the Profile Page
-import 'search_page.dart'; // Import the Search Page
-import 'messages_page.dart'; // Import the Messages Page
-import 'notification_page.dart'; // Import the Notification Page
-import 'view_user.dart'; // Import the User Page for individual user profiles
+import 'profile_page.dart';
+import 'search_page.dart';
+import 'messages_page.dart';
+import 'notification_page.dart';
+import 'view_user.dart';
+import 'api_service.dart';  // Import the ApiService
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -16,29 +17,38 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool isLoading = true;
+  List<Map<String, dynamic>> profiles = [];
 
-  List<Widget> _widgetOptions = <Widget>[];
-
-  List<Map<String, dynamic>> profiles = List.generate(15, (index) {
-    return {
-      'name': 'User ${index + 1}',
-      'age': 20 + index,
-      'bio': 'Bio for User ${index + 1}',
-      'avatar': 'https://via.placeholder.com/150', // Placeholder image URL
-    };
-  });
-
-  bool isLoading = false;
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _widgetOptions = <Widget>[
-      _buildHomePage(),
-      MessagesPage(),
-      NotificationPage(),
-      ProfilePage(username: widget.username), // Pass the email correctly
-    ];
+    _loadProfiles();
+  }
+
+  // Fetch user profiles based on matchmaking results
+  Future<void> _loadProfiles() async {
+    try {
+      // Call the matchmaking API to fetch profiles based on compatibility score
+      var response = await _apiService.getMatchmakingProfiles(widget.username);
+      if (response != null) {
+        setState(() {
+          profiles = List<Map<String, dynamic>>.from(response['profiles']); // Adjust as per API response structure
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching profiles: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _onItemTapped(int index) {
@@ -86,9 +96,9 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: isLoading
             ? CircularProgressIndicator()
-            : (_selectedIndex >= 0 && _selectedIndex < _widgetOptions.length)
-            ? _widgetOptions[_selectedIndex]
-            : Center(child: Text('Invalid Page Index!')),
+            : (profiles.isNotEmpty)
+            ? _buildHomePage()
+            : Center(child: Text('No profiles available')),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -193,6 +203,7 @@ class _HomePageState extends State<HomePage> {
                               age: profile['age'],
                               bio: profile['bio'],
                               avatar: profile['avatar'],
+                              username: username['username'],
                             ),
                           ),
                         );
@@ -243,7 +254,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-// void main() => runApp(MaterialApp(
-//   home: HomePage(username: ''), // Replace with actual email
-// ));

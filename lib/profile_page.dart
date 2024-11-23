@@ -16,6 +16,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late Future<Map<String, dynamic>?> _profileDataFuture;
   bool _isExpanded = false; // To track the expanded state
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _expandableCardKey = GlobalKey();
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfileView(BuildContext context, Map<String, dynamic> profileData) {
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -62,10 +65,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color.fromRGBO(153, 0, 76, 1), // Same color as AppBar background
+                      Color.fromRGBO(153, 0, 76, 0.5), // Reduced intensity
                       Colors.transparent
                     ],
-                    begin: Alignment.bottomCenter,
+                    begin: Alignment.bottomRight,
                     end: Alignment.topCenter,
                   ),
                 ),
@@ -105,57 +108,75 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ],
           ),
+          // Image Buttons Row above the Details card
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: Offset(0, 1), // changes position of shadow
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: KundaliImageButton(
+                        onPressed: () {
+                          print('Kundali button pressed!');
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Kundali',
+                      style: TextStyle(color: Colors.black, fontFamily: 'CustomFont2', fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: Offset(0, 1), // changes position of shadow
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: AshtakootMilanImageButton(
+                        onPressed: () {
+                          print('Ashtakoot Milan button pressed!');
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Ashtakoot Milan',
+                      style: TextStyle(color: Colors.black, fontFamily: 'CustomFont2', fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
           // Profile Info Section with Expandable Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: _buildExpandableInfoCard(profileData),
           ),
           SizedBox(height: 20),
-          // Image Buttons Row at the bottom
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: KundaliImageButton(
-                    onPressed: () {
-                      print('Kundali button pressed!');
-                    },
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: AshtakootMilanImageButton(
-                    onPressed: () {
-                      print('Ashtakoot Milan button pressed!');
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -164,6 +185,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Method to build an expandable card for profile info
   Widget _buildExpandableInfoCard(Map<String, dynamic> profileData) {
     return Card(
+      key: _expandableCardKey, // Assign the GlobalKey to the card
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 4,
       color: Color.fromRGBO(153, 0, 76, 1),
@@ -188,6 +210,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     setState(() {
                       _isExpanded = !_isExpanded; // Toggle the expanded state
                     });
+                    if (_isExpanded) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Scrollable.ensureVisible(
+                          _expandableCardKey.currentContext!,
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeInOut,
+                        );
+                      });
+                    }
                   },
                 ),
               ],
@@ -199,7 +230,6 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 _buildInfoColumn('Age', _getFieldValue(profileData, 'age')),
                 _buildInfoColumn('Gender', _getFieldValue(profileData, 'gender')),
-
               ],
             ),
             SizedBox(height: 16),
@@ -210,7 +240,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   _buildInfoColumn('Bio', _getFieldValue(profileData, 'bio')),
                   _buildInfoColumn('Phone', _getFieldValue(profileData, 'phone_number')),
-
                 ],
               ),
               SizedBox(height: 16),
@@ -219,7 +248,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   _buildInfoColumn('Religion', _getFieldValue(profileData, 'religion')),
                   _buildInfoColumn('Caste', _getFieldValue(profileData, 'caste')),
-
                 ],
               ),
             ],
