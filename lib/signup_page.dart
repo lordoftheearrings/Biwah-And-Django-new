@@ -209,7 +209,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                           Divider(color: Colors.pink, thickness: 1, indent: 50, endIndent: 50),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/');
+                              Navigator.pushNamed(context, '/login_page');
                             },
                             child: Text(
                               'Already have an account? Log In',

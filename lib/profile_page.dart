@@ -94,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Text(
                           _getFieldValue(profileData, 'name'),
-                          style: TextStyle(fontFamily: 'CustomFont2', color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontFamily: 'CustomFont2', color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
                         Text(

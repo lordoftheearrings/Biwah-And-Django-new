@@ -3,7 +3,7 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://192.168.121.219:8000/biwah'; // Consider using environment variables for flexibility
+  final String baseUrl = 'http://192.168.0.101:8000/biwah'; // Consider using environment variables for flexibility
 
   // Register User
   Future<void> registerUser(String username, String password) async {
@@ -15,7 +15,8 @@ class ApiService {
 
     if (response.statusCode != 201) {
       final errorData = jsonDecode(response.body);
-      throw Exception('Failed to register user: ${errorData['message'] ?? 'Unknown error'}');
+      throw Exception('Failed to register user: ${errorData['message'] ??
+          'Unknown error'}');
     }
   }
 
@@ -31,7 +32,8 @@ class ApiService {
       return true;
     } else {
       final errorData = jsonDecode(response.body);
-      throw Exception('Login failed: ${errorData['message'] ?? 'Invalid credentials'}');
+      throw Exception(
+          'Login failed: ${errorData['message'] ?? 'Invalid credentials'}');
     }
   }
 
@@ -85,7 +87,8 @@ class ApiService {
       }
 
       final response = await request.send();
-      final responseBody = await response.stream.bytesToString();  // Decode response stream
+      final responseBody = await response.stream
+          .bytesToString(); // Decode response stream
 
       if (response.statusCode == 200) {
         return true;
@@ -99,23 +102,46 @@ class ApiService {
     }
   }
 
-  // Matchmaking - Fetch matched profiles based on preferences
+// Matchmaking - Fetch matched profiles based on preferences
   Future<Map<String, dynamic>?> getMatchmakingProfiles(String username) async {
     try {
+      // Log the request details for debugging
+      print('Fetching matchmaking profiles for user: $username');
+      print('Request URL: $baseUrl/weighted_score/$username/');
+
       final response = await http.get(
-        Uri.parse('$baseUrl/matchmaking/$username/'),
+        Uri.parse('$baseUrl/weighted_score/$username/'),
         headers: {'Content-Type': 'application/json'},
       );
 
+
+
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        // Log the successful response body for debugging
+        print('Response Body: ${response.body}');
+
+        // Parse the response body
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+
+
+
+        // Return the parsed data (list of matched usernames, etc.)
+        return responseData;
+      } else if (response.statusCode == 404) {
+        // Log when no user or matches were found
+        print('User not found or no matches found for user: $username');
+        return null;
       } else {
-        print('Failed to load matchmaking profiles: ${response.statusCode}');
+        // Log unexpected status codes for debugging
+        print('Failed to load matchmaking profiles. Status Code: ${response.statusCode}');
+
         return null;
       }
     } catch (e) {
+      // Log any errors during the HTTP request
       print('Error fetching matchmaking profiles: $e');
       return null;
     }
   }
 }
+
