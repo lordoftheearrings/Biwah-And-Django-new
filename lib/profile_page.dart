@@ -203,8 +203,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 IconButton(
                   icon: Icon(
-                    _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                    color: Colors.pinkAccent,
+                    _isExpanded ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
+                    color: Colors.white,
                   ),
                   onPressed: () {
                     setState(() {

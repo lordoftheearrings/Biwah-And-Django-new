@@ -35,7 +35,7 @@ class ApiService {
     }
   }
 
-  // Load Profile Data
+  // Load Profile Data for a user
   Future<Map<String, dynamic>?> loadProfile(String username) async {
     final response = await http.get(
       Uri.parse('$baseUrl/user-profile/$username/'),

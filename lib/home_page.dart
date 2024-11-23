@@ -3,7 +3,7 @@ import 'profile_page.dart';
 import 'search_page.dart';
 import 'messages_page.dart';
 import 'notification_page.dart';
-import 'view_user.dart';
+import 'view_user.dart';  // Ensure ViewUser is imported
 import 'api_service.dart';  // Import the ApiService
 
 class HomePage extends StatefulWidget {
@@ -30,12 +30,15 @@ class _HomePageState extends State<HomePage> {
 
   // Fetch user profiles based on matchmaking results
   Future<void> _loadProfiles() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
       // Call the matchmaking API to fetch profiles based on compatibility score
       var response = await _apiService.getMatchmakingProfiles(widget.username);
-      if (response != null) {
+      if (response != null && response['profiles'].isNotEmpty) {
         setState(() {
-          profiles = List<Map<String, dynamic>>.from(response['profiles']); // Adjust as per API response structure
+          profiles = List<Map<String, dynamic>>.from(response['profiles']);
           isLoading = false;
         });
       } else {
@@ -55,6 +58,26 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
+    // Refresh profiles when the Home tab (index 0) is selected
+    if (_selectedIndex == 0) {
+      _loadProfiles(); // Reload profiles on home tab selection
+    }
+  }
+
+  // Build the body for each tab
+  Widget _buildPageContent() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildHomePage();
+      case 1:
+        return MessagesPage(); // Show Messages page
+      case 2:
+        return NotificationPage(); // Show Notifications page
+      case 3:
+        return ProfilePage(username: widget.username); // Show Profile page
+      default:
+        return _buildHomePage();
+    }
   }
 
   PreferredSizeWidget? _getAppBar() {
@@ -93,13 +116,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _getAppBar(),
-      body: Center(
-        child: isLoading
-            ? CircularProgressIndicator()
-            : (profiles.isNotEmpty)
-            ? _buildHomePage()
-            : Center(child: Text('No profiles available')),
-      ),
+      body: _buildPageContent(),  // Dynamic body based on selected index
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -128,7 +145,7 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.white,
         backgroundColor: Color.fromRGBO(153, 0, 76, 1),
         type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
+        onTap: _onItemTapped,  // Handle tap for navigation
       ),
     );
   }
@@ -136,13 +153,24 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHomePage() {
     return Container(
       color: Colors.black,
-      child: PageView.builder(
-        itemCount: profiles.length,
-        itemBuilder: (context, index) {
-          var profile = profiles[index];
-          return _buildProfileCard(profile, index);
-        },
-        scrollDirection: Axis.vertical,
+      child: Column(
+        children: [
+          // Display loading indicator or no profiles message
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : profiles.isEmpty
+              ? Center(child: Text('No matches found!'))
+              : Expanded(
+            child: PageView.builder(
+              itemCount: profiles.length,
+              itemBuilder: (context, index) {
+                var profile = profiles[index];
+                return _buildProfileCard(profile, index);
+              },
+              scrollDirection: Axis.vertical,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -198,13 +226,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ViewUser(
-                              name: profile['name'],
-                              age: profile['age'],
-                              bio: profile['bio'],
-                              avatar: profile['avatar'],
-                              username: username['username'],
-                            ),
+                            builder: (context) => ViewUser(username: profile['username']),
                           ),
                         );
                       },
