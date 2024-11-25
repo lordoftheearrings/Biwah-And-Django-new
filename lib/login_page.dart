@@ -25,8 +25,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       duration: const Duration(seconds: 1),
       vsync: this,
     );
-    _logoSizeAnimation = Tween<double>(begin: 200, end: 300).animate(_controller);
-    _backgroundOpacityAnimation = Tween<double>(begin: 0.3, end: 0.6).animate(_controller);
+    _logoSizeAnimation = Tween<double>(begin: 250, end: 300).animate(_controller);
+    _backgroundOpacityAnimation = Tween<double>(begin: 0.4, end: 0.6).animate(_controller);
     _controller.forward();
   }
 

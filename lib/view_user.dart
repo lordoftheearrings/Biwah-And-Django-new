@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart'; // Import your ApiService
-import 'edit_profile_page.dart'; // Import EditViewUser
+
 
 class ViewUser extends StatefulWidget {
   final String username;
@@ -50,7 +50,7 @@ class _ViewUserState extends State<ViewUser> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color.fromRGBO(153, 0, 76, 0.5),
+                      Color.fromRGBO(153, 0, 76, 0.8),
                       Colors.transparent
                     ],
                     begin: Alignment.bottomRight,
@@ -210,11 +210,8 @@ class _ViewUserState extends State<ViewUser> {
         onHorizontalDragStart: (details) {
           _swipeStart = details.localPosition.dx;
         },
-        onHorizontalDragUpdate: (details) {
-          // Optional: Handle swipe progress (e.g., showing a visual cue)
-        },
         onHorizontalDragEnd: (details) {
-          if (_swipeStart < MediaQuery.of(context).size.width / 2 && details.primaryVelocity! > 0) {
+          if (_swipeStart < MediaQuery.of(context).size.width / 1 && details.primaryVelocity! > 0) {
             // Swipe is sufficiently long and moving from left to right
             Navigator.pop(context);
           }

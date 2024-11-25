@@ -20,6 +20,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _age = '';
   String _gender = 'Male'; // Default gender value
   String _bio = '';
+  String _caste = 'Other';
+  String _religion = 'Other';
   bool _isLoading = false;
 
   // Image data
@@ -49,6 +51,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ? profileData['gender']
               : 'Male'; // Default to 'Male' if the gender is invalid
           _bio = profileData['bio'] ?? '';
+          _caste = ['Newar', 'Brahmin', 'Chhetri','Tamang','Gurung','Lama','Limbu','Other'].contains(profileData['caste']) ? profileData['caste']
+              : 'Other';
+          _religion= ['Hindu', 'Muslim', 'Christian','Buddhism','Jewish','Other'].contains(profileData['religion']) ? profileData['religion']
+              : 'Other';
         });
       }
     } catch (e) {
@@ -75,6 +81,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'age': int.tryParse(_age) ?? 0,
         'gender': _gender,
         'bio': _bio,
+        'caste':_caste,
+        'religion':_religion,
       };
 
       // Update profile with optional images
@@ -295,12 +303,65 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     _gender = newValue!;
                   });
                 },
+                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
                 items: ['Male', 'Female', 'Other']
+
                     .map((gender) => DropdownMenuItem(
                   value: gender,
                   child: Text(gender, style: TextStyle(color: Colors.white)),
                 ))
                     .toList(),
+              ),
+              SizedBox(height: 16),
+
+
+              DropdownButtonFormField<String>(
+                value: _caste,
+                decoration: InputDecoration(
+                  labelText: 'Caste',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+                dropdownColor: Colors.black,
+                style: TextStyle(color: Colors.white),
+                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                items: ['Brahmin', 'Chhetri', 'Newar', 'Tharu', 'Tamang','Rai','Magar','Limbu','Other']
+                    .map((caste) => DropdownMenuItem(
+                  value: caste,
+                  child: Text(caste, style: TextStyle(color: Colors.white)),
+                ))
+                    .toList(),
+                onChanged: (value) => setState(() => _caste = value ?? 'Other'),
+              ),
+              SizedBox(height: 16),
+
+              DropdownButtonFormField<String>(
+                value: _religion,
+                decoration: InputDecoration(
+                  labelText: 'Religion',
+                  labelStyle: TextStyle(fontWeight:FontWeight.bold,color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+                dropdownColor: Colors.black,
+                style: TextStyle(color: Colors.white),
+                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                items: ['Hindu', 'Muslim', 'Christian','Buddhism','Jewish','Other']
+                    .map((religion) => DropdownMenuItem(
+                  value: religion,
+                  child: Text(religion, style: TextStyle(color: Colors.white)),
+                ))
+                    .toList(),
+                onChanged: (value) => setState(() => _religion = value ?? 'Other'),
               ),
               SizedBox(height: 16),
 

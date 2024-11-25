@@ -4,6 +4,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
+
         <!-- MainActivity Configuration -->
         <activity
             android:name=".MainActivity"

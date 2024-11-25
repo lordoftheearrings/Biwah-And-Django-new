@@ -3,7 +3,7 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://192.168.0.101:8000/biwah'; // Consider using environment variables for flexibility
+  final String baseUrl = 'http://192.168.0.11:8000/biwah'; // Consider using environment variables for flexibility
 
   // Register User
   Future<void> registerUser(String username, String password) async {

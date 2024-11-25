@@ -26,6 +26,8 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService();
   late PageController _pageController;
 
+  double _swipeStart = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -47,17 +49,19 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
+      // Step 1: Fetch basic matchmaking profiles (usernames, avatar, etc.)
       var response = await _apiService.getMatchmakingProfiles(widget.username);
-      print('API response: $response');
+
 
       if (response != null && response['matches'] != null) {
         List<String> usernames = List<String>.from(response['matches']);
 
         if (usernames.isNotEmpty) {
+          // Step 2: Fetch additional profile details (age, bio, etc.) for each profile
           List<Map<String, dynamic>> newProfiles = [];
           for (var username in usernames) {
             var fullProfile = await _apiService.loadProfile(username);
-            print('Full profile: $fullProfile');
+
 
             if (fullProfile != null) {
               newProfiles.add(fullProfile);
@@ -93,13 +97,14 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = index;
     });
     if (_selectedIndex == 0) {
-      _loadProfiles();
+      _loadProfiles() ;
     } else {
       // Handle refresh for other pages
       setState(() {
-        // force refresh (clear state, reload data, etc.)
+        // Force refresh (clear state, reload data, etc.)
         isLoading = true;
         profiles.clear();
+        // Add logic to reload data for other pages if needed
       });
     }
   }
@@ -168,26 +173,26 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home_filled),
             label: 'Home',
-            backgroundColor: Colors.pink,
+
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.message_outlined),
             label: 'Messages',
-            backgroundColor: Colors.green,
+
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications_none_rounded),
             label: 'Notifications',
-            backgroundColor: Colors.blue,
+
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline_outlined),
             label: 'Profile',
-            backgroundColor: Colors.orange,
+
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Color.fromRGBO(255, 182, 193, 1),
+        selectedItemColor: Color.fromRGBO(255, 186, 196, 1.0),
         unselectedItemColor: Colors.white,
         backgroundColor: Color.fromRGBO(153, 0, 76, 1),
         type: BottomNavigationBarType.fixed,
@@ -212,7 +217,13 @@ class _HomePageState extends State<HomePage> {
           var profile = profiles[index];
           return GestureDetector(
             onHorizontalDragUpdate: (details) {
-              if (details.primaryDelta! < 0) {
+              if (details.primaryDelta! < -100) {
+                _swipeStart = details.localPosition.dx;
+              }
+            },
+            onHorizontalDragEnd: (details) {
+              if (_swipeStart > MediaQuery.of(context).size.width / 2 && details.primaryVelocity! < 0) {
+                // Swipe is sufficiently long and moving from right to left
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -302,28 +313,59 @@ class _HomePageState extends State<HomePage> {
                       ),
                       // Age, gender, religion, bio, etc.
                       Text(
-                        'Age: ${profile['age'] ?? 'Unknown'}', // Display age if available
-                        style: TextStyle(color: Colors.white),
+                        'Age: ${profile['age'] ?? 'Unknown'}', // Default value if age is null
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
                       ),
                       Text(
-                        'Religion: ${profile['religion'] ?? 'Unknown'}',
-                        style: TextStyle(color: Colors.white),
+                        'Gender: ${profile['gender'] ?? 'Unknown'}', // Default value if gender is null
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      Text(
+                        'Religion: ${profile['religion'] ?? 'Unknown'}', // Default value if religion is null
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      Text(
+                        'Caste: ${profile['caste'] ?? 'No caste available'}', // Default value if caste is null
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
                       ),
                     ],
                   ),
-                  // Match button on the right
-                  ElevatedButton(
-                    onPressed: () {
+                  // Match request button
+                  GestureDetector(
+                    onTap: () {
                       setState(() {
-                        isMatchSent = !isMatchSent; // Toggle match status
+                        isMatchSent = !isMatchSent; // Toggle match request state
+                        if (isMatchSent) {
+                          print('Match req sent to ${profile['username']}');
+                        } else {
+                          print('Match req canceled for ${profile['username']}');
+                        }
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isMatchSent ? Colors.red : Colors.green,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      textStyle: TextStyle(fontSize: 18),
+                    child: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isMatchSent ? Colors.red.withOpacity(0.5) : Colors.transparent,
+                      ),
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
-                    child: Text(isMatchSent ? 'Cancel Match' : 'Send Match'),
                   ),
                 ],
               ),

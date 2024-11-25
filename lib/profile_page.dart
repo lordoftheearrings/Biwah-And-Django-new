@@ -65,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color.fromRGBO(153, 0, 76, 0.5), // Reduced intensity
+                      Color.fromRGBO(153, 0, 76, 0.7), // Reduced intensity
                       Colors.transparent
                     ],
                     begin: Alignment.bottomRight,
