@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'edit_kundali_info.dart';
 import 'api_service.dart';
 
-
 class KundaliViewPage extends StatefulWidget {
   final String username;
 
@@ -13,25 +12,33 @@ class KundaliViewPage extends StatefulWidget {
   _KundaliViewPageState createState() => _KundaliViewPageState();
 }
 
-class _KundaliViewPageState extends State<KundaliViewPage> {
+class _KundaliViewPageState extends State<KundaliViewPage> with RouteAware {
   final ApiService apiService = ApiService();
   String? kundaliSvgContent;
   bool isLoading = false;
 
-  // Load Kundali info for the user
-  Future<void> loadKundali() async {
+  // Load profile info for the user
+  Future<void> loadProfile() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      // Retrieve the Kundali data using the username
+      // Retrieve the profile data using the username
       final profileData = await apiService.loadProfile(widget.username);
 
-      if (profileData != null && profileData['kundali_svg_content'] != null) {
-        setState(() {
-          kundaliSvgContent = profileData['kundali_svg_content'];
-        });
+      if (profileData != null) {
+        if (profileData['kundali_svg'] == null) {
+          setState(() {
+            kundaliSvgContent = null;
+          });
+        } else {
+          // Fetch the Kundali SVG content
+          final svgContent = await apiService.getKundaliSvg(widget.username);
+          setState(() {
+            kundaliSvgContent = svgContent;
+          });
+        }
       } else {
         setState(() {
           kundaliSvgContent = null;
@@ -49,7 +56,33 @@ class _KundaliViewPageState extends State<KundaliViewPage> {
   @override
   void initState() {
     super.initState();
-    loadKundali();
+    loadProfile();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadProfile();
+  }
+
+  @override
+  void didUpdateWidget(covariant KundaliViewPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.username != widget.username) {
+      loadProfile();
+    }
+  }
+
+  @override
+  void didPush() {
+    super.didPush();
+    loadProfile();
+  }
+
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    loadProfile();
   }
 
   @override
@@ -85,10 +118,9 @@ class _KundaliViewPageState extends State<KundaliViewPage> {
                   ),
                 ),
               );
-              if (updatedData != null && updatedData['kundali_svg_content'] != null) {
-                setState(() {
-                  kundaliSvgContent = updatedData['kundali_svg_content'];
-                });
+              if (updatedData != null) {
+                // Refresh the profile to get the updated Kundali SVG
+                loadProfile();
               }
             },
             child: Text(
@@ -136,10 +168,9 @@ class _KundaliViewPageState extends State<KundaliViewPage> {
                     ),
                   ),
                 );
-                if (updatedData != null && updatedData['kundali_svg_content'] != null) {
-                  setState(() {
-                    kundaliSvgContent = updatedData['kundali_svg_content'];
-                  });
+                if (updatedData != null) {
+                  // Refresh the profile to get the updated Kundali SVG
+                  loadProfile();
                 }
               },
               child: Text(
@@ -182,12 +213,11 @@ class _KundaliViewPageState extends State<KundaliViewPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: SvgPicture.string(
-                  kundaliSvgContent ?? '',
+                  kundaliSvgContent!,
                   placeholderBuilder: (context) => CircularProgressIndicator(),
                 ),
               ),
             ),
-            SizedBox(height: 10),
             _buildPlanetAbbreviations(),
           ],
         ),

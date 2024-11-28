@@ -3,7 +3,7 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://192.168.190.241:8000/biwah';
+  final String baseUrl = 'http://192.168.1.80:8000/biwah';
 
   // Register User
   Future<void> registerUser(String username, String password) async {
@@ -45,7 +45,9 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
+
       return jsonDecode(response.body);
+
     } else {
       print('Failed to load profile: ${response.statusCode}');
       return null;
@@ -177,19 +179,13 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        print('Saved Kundali: ${response.body}');
+        return {'message': 'Kundali Saved'};
 
-        // Extract the SVG content directly from the response
-        String kundaliSvgContent = data['kundali_svg_content'];
 
-        print('Kundali generated successfully');
-        print(kundaliSvgContent);
         // Return the SVG content and message in a Map
-        return {
-          'message': 'Kundali generated and saved',
-          'kundali_svg_content': kundaliSvgContent,
 
-        };
+
       } else {
         print('Failed to generate Kundali: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -197,6 +193,32 @@ class ApiService {
       }
     } catch (e) {
       print('Error generating Kundali: $e');
+      return null;
+    }
+  }
+  Future<String?> getKundaliSvg(String username) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/retrieve_kundali/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        if (data.isNotEmpty && data[0] is String) {
+          final svgContent = data[0] as String;
+          return svgContent;
+        } else {
+          print('Unexpected response format: $data');
+          return null;
+        }
+      } else {
+        print('Failed to fetch Kundali: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching Kundali: $e');
       return null;
     }
   }

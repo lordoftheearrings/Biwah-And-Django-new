@@ -67,29 +67,58 @@ class _EditKundaliInfoPageState extends State<EditKundaliInfoPage> {
     try {
       final response = await apiService.generateKundali(
         username: widget.username,
-        year: int.parse(yearController.text),
-        month: int.parse(monthController.text),
-        day: int.parse(dayController.text),
-        hour: int.parse(hourController.text),
-        minute: int.parse(minuteController.text),
-        second: int.parse(secondController.text),
-        latitude: double.parse(latitudeController.text),
-        longitude: double.parse(longitudeController.text),
+        year: _parseInt(yearController.text),
+        month: _parseInt(monthController.text),
+        day: _parseInt(dayController.text),
+        hour: _parseInt(hourController.text),
+        minute: _parseInt(minuteController.text),
+        second: _parseInt(secondController.text),
+        latitude: _parseDouble(latitudeController.text),
+        longitude: _parseDouble(longitudeController.text),
         birthLocation: birthLocationController.text,
       );
 
       if (response != null) {
-        Navigator.pop(context, response);
+        // Pop the current screen and return
+        Navigator.pop(context);
       } else {
-        print("Failed to save Kundali info.");
+        _showErrorDialog("Failed to generate Kundali.");
       }
     } catch (e) {
-      print("Error saving Kundali info: $e");
+      _showErrorDialog("Error saving Kundali info: $e");
     } finally {
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  int _parseInt(String text) {
+    return text.isEmpty ? 0 : int.tryParse(text) ?? 0;
+  }
+
+  double _parseDouble(String text) {
+    return text.isEmpty ? 0.0 : double.tryParse(text) ?? 0.0;
   }
 
   @override
@@ -138,7 +167,7 @@ class _EditKundaliInfoPageState extends State<EditKundaliInfoPage> {
             SizedBox(height: 16),
             buildTextField('Longitude', longitudeController),
             SizedBox(height: 16),
-            buildTextField('Birth Location', birthLocationController),
+            buildTextField('Birth Location', birthLocationController, keyboardType: TextInputType.text),
             SizedBox(height: 32),
             Center(
               child: SizedBox(
@@ -155,9 +184,7 @@ class _EditKundaliInfoPageState extends State<EditKundaliInfoPage> {
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromRGBO(255, 182, 193, 1),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -171,7 +198,7 @@ class _EditKundaliInfoPageState extends State<EditKundaliInfoPage> {
     );
   }
 
-  Widget buildTextField(String label, TextEditingController controller) {
+  Widget buildTextField(String label, TextEditingController controller, {TextInputType keyboardType = TextInputType.number}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -184,7 +211,7 @@ class _EditKundaliInfoPageState extends State<EditKundaliInfoPage> {
           borderSide: BorderSide(color: Colors.white),
         ),
       ),
-      keyboardType: TextInputType.number,
+      keyboardType: keyboardType,
       style: TextStyle(color: Colors.white),
       cursorColor: Colors.white,
     );
