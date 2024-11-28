@@ -20,24 +20,24 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       backgroundColor: Color.fromRGBO(68, 29, 47, 1.0),
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context); // Go back to the previous page
-          },
-        ),
-        title: Text(
-          'Change Password',
-          style: TextStyle(
-            fontFamily: 'CustomFont3',
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: Color.fromRGBO(153, 0, 76, 1), // Same as the card color
-        elevation: 5,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+        onPressed: () {
+          Navigator.pop(context); // Go back to the previous page
+        },
       ),
+      title: Text(
+        'Change Password',
+        style: TextStyle(
+          fontFamily: 'CustomFont3',
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      backgroundColor: Color.fromRGBO(153, 0, 76, 1), // Same as the card color
+      elevation: 5,
+    ),
       body: SingleChildScrollView( // Allow the content to scroll if necessary
         child: Container(
           color: Colors.white, // Set background to white

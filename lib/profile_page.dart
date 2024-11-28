@@ -3,6 +3,8 @@ import 'api_service.dart'; // Import your ApiService
 import 'edit_profile_page.dart'; // Import EditProfilePage
 import 'app_settings.dart';
 import 'image_button.dart'; // Import the image_buttons.dart file
+import 'kundali_view.dart';
+import 'edit_ashtakoot.dart';
 
 class ProfilePage extends StatefulWidget {
   final String username;
@@ -130,7 +132,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: KundaliImageButton(
                         onPressed: () {
-                          print('Kundali button pressed!');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KundaliViewPage(username: widget.username),
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -157,7 +164,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: AshtakootMilanImageButton(
                         onPressed: () {
-                          print('Ashtakoot Milan button pressed!');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditAshtakoot(),
+                            ),
+                          );
                         },
                       ),
                     ),

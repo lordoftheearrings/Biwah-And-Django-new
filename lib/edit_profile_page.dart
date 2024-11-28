@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Import image_picker package
-import 'api_service.dart'; // Import your ApiService
-import 'dart:io'; // For handling file picking
-import 'dart:typed_data'; // For handling binary data
+import 'package:image_picker/image_picker.dart';
+import 'api_service.dart';
+import 'dart:io';
+
 
 class EditProfilePage extends StatefulWidget {
   final String username;
@@ -18,13 +18,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _name = '';
   String _phoneNumber = '';
   String _age = '';
-  String _gender = 'Male'; // Default gender value
+  String _gender = 'Male';
   String _bio = '';
   String _caste = 'Other';
   String _religion = 'Other';
   bool _isLoading = false;
-
-  // Image data
   File? _profileImage;
   File? _coverImage;
 
@@ -33,11 +31,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.initState();
     _loadExistingProfile();
   }
-
-  // Load existing profile data if available
   Future<void> _loadExistingProfile() async {
     setState(() {
-      _isLoading = true; // Set loading state to true
+      _isLoading = true;
     });
 
     try {
@@ -45,11 +41,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (profileData != null) {
         setState(() {
           _name = profileData['name'] ?? '';
-          _phoneNumber = profileData['phone_number']?.toString() ?? '';  // Ensure the number is a string
-          _age = profileData['age']?.toString() ?? ''; // Ensure age is a string
+          _phoneNumber = profileData['phone_number']?.toString() ?? '';
+          _age = profileData['age']?.toString() ?? '';
           _gender = ['Male', 'Female', 'Other'].contains(profileData['gender'])
               ? profileData['gender']
-              : 'Male'; // Default to 'Male' if the gender is invalid
+              : 'Male';
           _bio = profileData['bio'] ?? '';
           _caste = ['Newar', 'Brahmin', 'Chhetri','Tamang','Gurung','Lama','Limbu','Other'].contains(profileData['caste']) ? profileData['caste']
               : 'Other';
@@ -61,20 +57,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
       print('Error loading profile for editing: $e');
     } finally {
       setState(() {
-        _isLoading = false; // Set loading state to false after fetching data
+        _isLoading = false;
       });
     }
   }
-
-  // Save or update the profile data
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
       });
-
-      // Prepare profile data without images
       Map<String, dynamic> profileData = {
         'name': _name,
         'phone_number': int.tryParse(_phoneNumber) ?? 0,
@@ -84,8 +76,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'caste':_caste,
         'religion':_religion,
       };
-
-      // Update profile with optional images
       bool success = await ApiService().updateProfileWithOptionalImages(
         username: widget.username,
         profileData: profileData,
@@ -106,10 +96,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
     }
   }
-
-  // Pick image using ImagePicker
   Future<void> _pickImage(bool isProfileImage) async {
-    // Don't pick image if it's already selected
     if ((isProfileImage && _profileImage != null) || (!isProfileImage && _coverImage != null)) {
       return; // Exit if an image is already selected
     }
@@ -177,7 +164,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Profile Image Picker
               Text('Profile Image', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               Center(
                 child: GestureDetector(
@@ -197,8 +183,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               SizedBox(height: 25),
-
-              // Cover Image Picker
               Text('Cover Image', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               SizedBox(height: 15),
               GestureDetector(
@@ -222,8 +206,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               SizedBox(height: 20),
-
-              // Name Field
               TextFormField(
                 initialValue: _name,
                 decoration: InputDecoration(
@@ -241,8 +223,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 onSaved: (value) => _name = value!,
               ),
               SizedBox(height: 16),
-
-              // Phone Number Field
               TextFormField(
                 initialValue: _phoneNumber,
                 decoration: InputDecoration(
@@ -262,8 +242,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 onSaved: (value) => _phoneNumber = value!,
               ),
               SizedBox(height: 16),
-
-              // Age Field
               TextFormField(
                 initialValue: _age,
                 decoration: InputDecoration(
@@ -282,8 +260,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 onSaved: (value) => _age = value!,
               ),
               SizedBox(height: 16),
-
-              // Gender Dropdown
               DropdownButtonFormField<String>(
                 value: _gender,
                 decoration: InputDecoration(
@@ -364,8 +340,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 onChanged: (value) => setState(() => _religion = value ?? 'Other'),
               ),
               SizedBox(height: 16),
-
-              // Bio Field
               TextFormField(
                 initialValue: _bio,
                 decoration: InputDecoration(

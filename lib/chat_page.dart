@@ -10,7 +10,30 @@ class ChatPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('$sender'),
-        backgroundColor: Color.fromRGBO(153, 0, 76, 1), // Same as MessagesPage
+        backgroundColor: Color.fromRGBO(153, 0, 76, 1),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.call),
+            onPressed: () {
+              // Add call logic here
+            },
+            tooltip: 'Call',
+          ),
+          IconButton(
+            icon: Icon(Icons.videocam),
+            onPressed: () {
+              // Add video call logic here
+            },
+            tooltip: 'Video Call',
+          ),
+          IconButton(
+            icon: Icon(Icons.camera_alt),
+            onPressed: () {
+              // Add photo sending logic here
+            },
+            tooltip: 'Send Photo',
+          ),
+        ],
       ),
       body: Container(
         color: Colors.black,
@@ -19,27 +42,45 @@ class ChatPage extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: <Widget>[
-                  // Chat bubbles will go here
                   _buildMessage("Hello!", true),
                   _buildMessage("How are you?", false),
                   _buildMessage("I'm good, thanks!", true),
+                  _buildMessage("Are you free later today?", false),
+                  _buildMessage("Yes, let's catch up!", true),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[800],
-                  hintText: 'Type a message...',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide.none,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.add_photo_alternate, color: Colors.white),
+                    onPressed: () {
+                      // Add photo logic
+                    },
                   ),
-                  suffixIcon: Icon(Icons.send, color: Colors.white),
-                ),
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey[800],
+                        hintText: 'Type a message...',
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send, color: Colors.white),
+                    onPressed: () {
+                      // Add send message logic
+                    },
+                  ),
+                ],
               ),
             ),
           ],

@@ -14,9 +14,9 @@ class MyApp extends StatelessWidget {
       title: 'Biwah Bandhan',
       initialRoute: '/splash_screen',  // Set the initial route to SplashScreen
       routes: {
-        '/splash_screen': (context) => SplashScreen(), // Splash screen route
-        '/login_page': (context) => LoginPage(),
-        '/sign_up': (context) => SignUpPage(),
+         '/splash_screen': (context) => SplashScreen(), // Splash screen route
+         '/login_page': (context) => LoginPage(),
+         '/sign_up': (context) => SignUpPage(),
         '/home': (context) => HomePage(username: ModalRoute.of(context)!.settings.arguments as String),
       },
     );

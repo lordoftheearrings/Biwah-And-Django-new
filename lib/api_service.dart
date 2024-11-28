@@ -3,7 +3,7 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://192.168.0.11:8000/biwah'; // Consider using environment variables for flexibility
+  final String baseUrl = 'http://192.168.190.241:8000/biwah';
 
   // Register User
   Future<void> registerUser(String username, String password) async {
@@ -140,6 +140,102 @@ class ApiService {
     } catch (e) {
       // Log any errors during the HTTP request
       print('Error fetching matchmaking profiles: $e');
+      return null;
+    }
+  }
+
+
+// Generate Kundali
+  Future<Map<String, dynamic>?> generateKundali({
+    required String username,
+    required int year,
+    required int month,
+    required int day,
+    required int hour,
+    required int minute,
+    required int second,
+    required double latitude,
+    required double longitude,
+    required String birthLocation,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/generate_kundali/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'year': year,
+          'month': month,
+          'day': day,
+          'hour': hour,
+          'minute': minute,
+          'second': second,
+          'latitude': latitude,
+          'longitude': longitude,
+          'birth_location': birthLocation,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Extract the SVG content directly from the response
+        String kundaliSvgContent = data['kundali_svg_content'];
+
+        print('Kundali generated successfully');
+        print(kundaliSvgContent);
+        // Return the SVG content and message in a Map
+        return {
+          'message': 'Kundali generated and saved',
+          'kundali_svg_content': kundaliSvgContent,
+
+        };
+      } else {
+        print('Failed to generate Kundali: ${response.statusCode}');
+        print('Response: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error generating Kundali: $e');
+      return null;
+    }
+  }
+
+// Fetch Gun Milan Points
+  Future<Map<String, dynamic>?> calculateAshtakootPoints(
+      Map<String, dynamic> boyDetails, Map<String, dynamic> girlDetails) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/ashtakoot/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'year_boy': boyDetails['year'],
+          'month_boy': boyDetails['month'],
+          'day_boy': boyDetails['day'],
+          'hour_boy': boyDetails['hour'],
+          'minute_boy': boyDetails['minute'],
+          'second_boy': boyDetails['second'],
+          'latitude_boy': boyDetails['latitude'],
+          'longitude_boy': boyDetails['longitude'],
+          'year_girl': girlDetails['year'],
+          'month_girl': girlDetails['month'],
+          'day_girl': girlDetails['day'],
+          'hour_girl': girlDetails['hour'],
+          'minute_girl': girlDetails['minute'],
+          'second_girl': girlDetails['second'],
+          'latitude_girl': girlDetails['latitude'],
+          'longitude_girl': girlDetails['longitude'],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Failed to calculate Ashtakoot points: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error calculating Ashtakoot points: $e');
       return null;
     }
   }

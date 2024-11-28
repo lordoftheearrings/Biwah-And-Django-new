@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark(), // Set the theme to dark
-      debugShowCheckedModeBanner: false,
-      home: MessagesPage(),
-    );
-  }
-}
+import 'chat_page.dart'; // Import the ChatPage class
 
 class MessagesPage extends StatelessWidget {
   final List<Conversation> _conversations = [
     Conversation(sender: 'User 1', message: 'Hello!', timestamp: '10:30 AM'),
-    Conversation(sender: 'User 2', message: 'Hi there!', timestamp: '9:45 AM'),
-    Conversation(sender: 'User 3', message: 'How are you?', timestamp: '8:15 AM'),
-    // Add more conversations here
+    Conversation(sender: 'User 2', message: 'Hi there! How’s it going?', timestamp: '9:45 AM'),
+    Conversation(sender: 'User 3', message: 'How are you doing?', timestamp: '8:15 AM'),
+    Conversation(sender: 'User 4', message: 'Are you free later today?', timestamp: '7:00 AM'),
+    Conversation(sender: 'User 5', message: 'Can we talk later?', timestamp: 'Yesterday'),
+    Conversation(sender: 'User 6', message: 'What’s up?', timestamp: 'Yesterday'),
+    // Add more conversations here as needed
   ];
 
   @override
@@ -32,18 +21,19 @@ class MessagesPage extends StatelessWidget {
         title: Text(
           'Messages',
           style: TextStyle(
-            fontFamily: 'CustomFont3', // Add custom font if needed
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
+            fontFamily: 'CustomFont3',
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
         ),
         backgroundColor: Color.fromRGBO(153, 0, 76, 1),
-        elevation: 5,
+        elevation: 0,
       ),
       body: Container(
-        color: Colors.black,
+        color: Colors.white,
         child: ListView.builder(
+          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0), // Reduced padding
           itemCount: _conversations.length,
           itemBuilder: (context, index) {
             return _buildConversationTile(context, _conversations[index]);
@@ -53,37 +43,33 @@ class MessagesPage extends StatelessWidget {
     );
   }
 
-  // Function to build each conversation tile
   Widget _buildConversationTile(BuildContext context, Conversation conversation) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0), // Reduced vertical padding
       child: InkWell(
         onTap: () {
-          // Navigate to the ChatPage when the conversation tile is tapped
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChatPage(sender: conversation.sender),
+              builder: (context) => ChatPage(sender: conversation.sender), // Navigate to ChatPage
             ),
           );
         },
         child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: Colors.grey[900],
-          elevation: 4,
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          color: Color.fromRGBO(153, 0, 76, 1),
           child: ListTile(
-            contentPadding: EdgeInsets.all(16),
+            contentPadding: EdgeInsets.all(8), // Reduced padding
             leading: CircleAvatar(
-              radius: 30,
-              backgroundImage: AssetImage('assets/logo10e.png'), // Set the profile picture here
+              radius: 28, // Slightly smaller avatar
+              backgroundImage: AssetImage('assets/logo10e.png'), // Replace with your image
             ),
             title: Text(
               conversation.sender,
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),
             ),
@@ -93,19 +79,18 @@ class MessagesPage extends StatelessWidget {
                   child: Text(
                     conversation.message,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.white70,
                     ),
-                    overflow: TextOverflow.ellipsis, // To handle long messages
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(width: 8),
-                // Online status indicator
+                SizedBox(width: 6), // Reduced spacing
                 Container(
                   width: 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: Colors.green, // Green dot for online status
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -114,8 +99,8 @@ class MessagesPage extends StatelessWidget {
             trailing: Text(
               conversation.timestamp,
               style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
+                fontSize: 12,
+                color: Colors.grey[500],
               ),
             ),
           ),
@@ -135,73 +120,4 @@ class Conversation {
     required this.message,
     required this.timestamp,
   });
-}
-
-class ChatPage extends StatelessWidget {
-  final String sender;
-
-  ChatPage({required this.sender});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('$sender'),
-        backgroundColor: Color.fromRGBO(153, 0, 76, 1), // Same as MessagesPage
-      ),
-      body: Container(
-        color: Colors.black,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  // Chat bubbles will go here
-                  _buildMessage("Hello!", true),
-                  _buildMessage("How are you?", false),
-                  _buildMessage("I'm good, thanks!", true),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[800],
-                  hintText: 'Type a message...',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: Icon(Icons.send, color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessage(String message, bool isSent) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Align(
-        alignment: isSent ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-          decoration: BoxDecoration(
-            color: isSent ? Colors.purple : Colors.grey[800],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            message,
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        ),
-      ),
-    );
-  }
 }

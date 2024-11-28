@@ -20,8 +20,8 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = true;
   bool loadingMore = false;
   List<Map<String, dynamic>> profiles = [];
-  int offset = 0;  // Track offset for batch loading
-  final int limit = 10;  // Define batch size
+  int offset = 0; // Track offset for batch loading
+  final int limit = 10; // Define batch size
 
   final ApiService _apiService = ApiService();
   late PageController _pageController;
@@ -41,7 +41,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Fetch user profiles based on matchmaking results
   Future<void> _loadProfiles() async {
     if (loadingMore) return; // Avoid multiple concurrent API calls
     setState(() {
@@ -49,45 +48,40 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      // Step 1: Fetch basic matchmaking profiles (usernames, avatar, etc.)
       var response = await _apiService.getMatchmakingProfiles(widget.username);
-
 
       if (response != null && response['matches'] != null) {
         List<String> usernames = List<String>.from(response['matches']);
 
         if (usernames.isNotEmpty) {
-          // Step 2: Fetch additional profile details (age, bio, etc.) for each profile
           List<Map<String, dynamic>> newProfiles = [];
           for (var username in usernames) {
             var fullProfile = await _apiService.loadProfile(username);
-
-
             if (fullProfile != null) {
               newProfiles.add(fullProfile);
             }
           }
 
           setState(() {
-            profiles.addAll(newProfiles);  // Add the profiles with full details to the list
-            offset += limit;  // Update offset for next batch
-            isLoading = false;  // Stop loading indicator
-            loadingMore = false;  // Reset loadingMore flag
+            profiles.addAll(newProfiles);
+            offset += limit;
+            isLoading = false;
+            loadingMore = false;
           });
         } else {
           setState(() {
-            loadingMore = false;  // No more profiles to load
+            loadingMore = false;
           });
         }
       } else {
         setState(() {
-          loadingMore = false;  // Handle case if response doesn't include profiles
+          loadingMore = false;
         });
       }
     } catch (e) {
       print('Error fetching profiles: $e');
       setState(() {
-        loadingMore = false;  // Reset flag if an error occurs
+        loadingMore = false;
       });
     }
   }
@@ -97,25 +91,21 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = index;
     });
     if (_selectedIndex == 0) {
-      _loadProfiles() ;
+      _loadProfiles();
     } else {
-      // Handle refresh for other pages
       setState(() {
-        // Force refresh (clear state, reload data, etc.)
         isLoading = true;
         profiles.clear();
-        // Add logic to reload data for other pages if needed
       });
     }
   }
 
   void _onPageChanged(int index) {
-    if (index >= profiles.length - 5 && !loadingMore) {
+    if (index >= profiles.length - 6 && !loadingMore) {
       _loadProfiles();
     }
   }
 
-  // Build the body for each tab
   Widget _buildPageContent() {
     switch (_selectedIndex) {
       case 0:
@@ -169,34 +159,38 @@ class _HomePageState extends State<HomePage> {
       appBar: _getAppBar(),
       body: _buildPageContent(),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white60,
+        backgroundColor: Color.fromRGBO(153, 0, 76, 1),
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
+            icon: Icon(
+              _selectedIndex == 0 ? Icons.home : Icons.home_outlined,
+            ),
             label: 'Home',
-
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.message_outlined),
+            icon: Icon(
+              _selectedIndex == 1 ? Icons.message : Icons.message_outlined,
+            ),
             label: 'Messages',
-
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_none_rounded),
+            icon: Icon(
+              _selectedIndex == 2 ? Icons.notifications : Icons.notifications_none_rounded,
+            ),
             label: 'Notifications',
-
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_outlined),
+            icon: Icon(
+              _selectedIndex == 3 ? Icons.person : Icons.person_outline_outlined,
+            ),
             label: 'Profile',
-
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color.fromRGBO(255, 186, 196, 1.0),
-        unselectedItemColor: Colors.white,
-        backgroundColor: Color.fromRGBO(153, 0, 76, 1),
-        type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
       ),
     );
   }
@@ -217,17 +211,17 @@ class _HomePageState extends State<HomePage> {
           var profile = profiles[index];
           return GestureDetector(
             onHorizontalDragUpdate: (details) {
-              if (details.primaryDelta! < -100) {
+              if (details.primaryDelta! < 0) {
                 _swipeStart = details.localPosition.dx;
               }
             },
             onHorizontalDragEnd: (details) {
-              if (_swipeStart > MediaQuery.of(context).size.width / 2 && details.primaryVelocity! < 0) {
-                // Swipe is sufficiently long and moving from right to left
+              if (details.primaryVelocity! < -500) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ViewUser(username: profile['username']),
+                    builder: (context) =>
+                        ViewUser(username: profile['username']),
                   ),
                 );
               }
@@ -240,26 +234,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildProfileCard(Map<String, dynamic> profile) {
-    bool isMatchSent = false; // Track if match request is sent
+    bool isMatchSent = false;
 
     return Container(
-      height: MediaQuery.of(context).size.height, // Set a fixed height
+      height: MediaQuery.of(context).size.height,
       child: Stack(
         children: [
-          // Cover image as background
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: profile['cover_image'] != null
                     ? NetworkImage(profile['cover_image'])
-                    : AssetImage('assets/bgimg6.jpg') as ImageProvider, // Default image if cover_image is null
+                    : AssetImage('assets/bgimg6.jpg') as ImageProvider,
                 fit: BoxFit.cover,
               ),
             ),
             height: double.infinity,
             width: double.infinity,
           ),
-          // Gradient overlay for readability
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -269,7 +261,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          // Profile details
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -277,32 +268,30 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Profile information on the left
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Circular profile picture
                       CircleAvatar(
                         radius: 40,
                         backgroundImage: profile['profile_image'] != null
                             ? NetworkImage(profile['profile_image'])
-                            : AssetImage('assets/logo10.png') as ImageProvider, // Default image if profile_image is null
+                            : AssetImage('assets/logo10.png') as ImageProvider,
                         backgroundColor: Colors.white,
                       ),
                       SizedBox(height: 10),
-                      // Username (Clickable)
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ViewUser(username: profile['username']),
+                              builder: (context) =>
+                                  ViewUser(username: profile['username']),
                             ),
                           );
                         },
                         child: Text(
-                          profile['name'] ?? 'Unknown', // Default value if name is null
+                          profile['name'] ?? 'Unknown',
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -311,30 +300,22 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      // Age, gender, religion, bio, etc.
                       Text(
-                        'Age: ${profile['age'] ?? 'Unknown'}', // Default value if age is null
+                        'Age: ${profile['age'] ?? 'Unknown'}',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
                         ),
                       ),
                       Text(
-                        'Gender: ${profile['gender'] ?? 'Unknown'}', // Default value if gender is null
+                        'Caste: ${profile['caste'] ?? 'Unknown'}',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
                         ),
                       ),
                       Text(
-                        'Religion: ${profile['religion'] ?? 'Unknown'}', // Default value if religion is null
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Text(
-                        'Caste: ${profile['caste'] ?? 'No caste available'}', // Default value if caste is null
+                        'Religion: ${profile['religion'] ?? 'Unknown'}',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
@@ -342,30 +323,24 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  // Match request button
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isMatchSent = !isMatchSent; // Toggle match request state
-                        if (isMatchSent) {
-                          print('Match req sent to ${profile['username']}');
-                        } else {
-                          print('Match req canceled for ${profile['username']}');
-                        }
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isMatchSent ? Colors.red.withOpacity(0.5) : Colors.transparent,
-                      ),
-                      child: Icon(
-                        Icons.favorite,
-                        color: Colors.white,
-                        size: 32,
-                      ),
+                  IconButton(
+                    icon: Icon(
+                      isMatchSent ? Icons.favorite : Icons.favorite_border,
+                      color: isMatchSent ? Colors.red : Colors.white,
+                      size: 30,
                     ),
+                    onPressed: () {
+                      setState(() {
+                        isMatchSent = !isMatchSent;
+                      });
+                      if (isMatchSent) {
+                        print(
+                            "Match request sent to ${profile['username']}.");
+                      } else {
+                        print(
+                            "Match request removed for ${profile['username']}.");
+                      }
+                    },
                   ),
                 ],
               ),
