@@ -5,6 +5,7 @@ import 'app_settings.dart';
 import 'image_button.dart'; // Import the image_buttons.dart file
 import 'kundali_view.dart';
 import 'edit_ashtakoot.dart';
+import 'my_matches.dart';
 
 class ProfilePage extends StatefulWidget {
   final String username;
@@ -303,7 +304,7 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          '${widget.username}',
+          'Hi, ${widget.username}',
           style: TextStyle(
             fontSize: 28,
             fontFamily: 'CustomFont2',
@@ -313,7 +314,15 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         backgroundColor: Color.fromRGBO(153, 0, 76, 1),
         actions: [
-          // Edit Profile button to the left of settings icon
+          IconButton(
+            icon: Icon(Icons.people_alt_rounded, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MatchesPage(username:widget.username)),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.edit, color: Colors.white),
             onPressed: () async {

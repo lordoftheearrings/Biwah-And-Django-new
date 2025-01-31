@@ -3,17 +3,17 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://192.168.1.80:8000/biwah';
+  final String baseUrl = 'http://127.0.0.1:8000';
 
   // Register User
   Future<void> registerUser(String username, String password) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/register/'),
+      Uri.parse('$baseUrl/biwah/register/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'password': password}),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode   != 201) {
       final errorData = jsonDecode(response.body);
       throw Exception('Failed to register user: ${errorData['message'] ??
           'Unknown error'}');
@@ -23,7 +23,7 @@ class ApiService {
   // Login User
   Future<bool> loginUser(String username, String password) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/login/'),
+      Uri.parse('$baseUrl/biwah/login/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'password': password}),
     );
@@ -40,7 +40,7 @@ class ApiService {
   // Load Profile Data for a user
   Future<Map<String, dynamic>?> loadProfile(String username) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/user-profile/$username/'),
+      Uri.parse('$baseUrl/biwah/user-profile/$username/'),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -64,7 +64,7 @@ class ApiService {
     try {
       var request = http.MultipartRequest(
         'PATCH',
-        Uri.parse('$baseUrl/update-profile/$username/'),
+        Uri.parse('$baseUrl/biwah/update-profile/$username/'),
       );
 
       // Add profile fields (name, phone number, etc.)
@@ -109,10 +109,10 @@ class ApiService {
     try {
       // Log the request details for debugging
       print('Fetching matchmaking profiles for user: $username');
-      print('Request URL: $baseUrl/weighted_score/$username/');
+      print('Request URL: $baseUrl/biwah/weighted_score/$username/');
 
       final response = await http.get(
-        Uri.parse('$baseUrl/weighted_score/$username/'),
+        Uri.parse('$baseUrl/biwah/weighted_score/$username/'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -162,7 +162,7 @@ class ApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/generate_kundali/'),
+        Uri.parse('$baseUrl/biwah/generate_kundali/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': username,
@@ -199,7 +199,7 @@ class ApiService {
   Future<String?> getKundaliSvg(String username) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/retrieve_kundali/'),
+        Uri.parse('$baseUrl/biwah/retrieve_kundali/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': username}),
       );
@@ -228,7 +228,7 @@ class ApiService {
       Map<String, dynamic> boyDetails, Map<String, dynamic> girlDetails) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/ashtakoot/'),
+        Uri.parse('$baseUrl/biwah/ashtakoot/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'year_boy': boyDetails['year'],
@@ -261,5 +261,153 @@ class ApiService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>> sendMatchRequest(String senderUsername,String receiverUsername) async {
+    final url = Uri.parse('$baseUrl/chat/send_match_request/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+
+      },
+      body: json.encode({
+        'sender_username': senderUsername,
+        'receiver_username': receiverUsername
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else if(response.statusCode == 400){
+      return {'message': json.decode(response.body)['message']};
+    }else {
+      return {'error': 'Failed to send match request'};
+    }
+  }
+
+  Future<Map<String, dynamic>> cancelMatchRequest(String senderUsername, String receiverUsername) async {
+    final url = Uri.parse('$baseUrl/chat/cancel_match_request/');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'sender_username': senderUsername,
+        'receiver_username': receiverUsername,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else if (response.statusCode == 400) {
+      final errorMessage = json.decode(response.body)['error'];
+      return {'error': errorMessage};
+    } else {
+      return {'error': 'Failed to cancel match request'};
+    }
+  }
+
+  Future<Map<String, dynamic>> acceptMatchRequest(String sender, String receiver) async {
+    final url = Uri.parse('$baseUrl/chat/accept_match_request/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'sender': sender, 'receiver': receiver}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      return {'error': 'Failed to accept match request'};
+    }
+  }
+
+  Future<Map<String, dynamic>> declineMatchRequest(String sender, String receiver) async {
+    final url = Uri.parse('$baseUrl/chat/decline_match_request/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'sender': sender, 'receiver': receiver}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      return {'error': 'Failed to decline match request'};
+    }
+  }
+
+
+  Future<Map<String, dynamic>> listMatchRequests(String username) async {
+    final url = Uri.parse('$baseUrl/chat/list_match_requests/?username=$username');
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      return {'error': 'Failed to fetch match requests'};
+    }
+  }
+
+  Future<List< dynamic>> fetchChatRooms(String username) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/chat/fetch-chat-rooms/?username=$username'),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception ( "Failed to load chat rooms");
+      }
+    } catch (e) {
+      throw Exception('Error fetching chat rooms: $e');
+    }
+  }
+
+
+  // Future<Map<String, dynamic>> sendMessage(String roomName, String senderUsername, String content) async {
+  //   final url = Uri.parse('$baseUrl/chat/send-message/');
+  //   final response = await http.post(
+  //     url,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: json.encode({
+  //       'room_name': roomName,
+  //       'sender_username': senderUsername,
+  //       'content': content,
+  //     }),
+  //   );
+  //
+  //   if (response.statusCode == 201) {
+  //     return json.decode(response.body);
+  //   } else {
+  //     return {'error': 'Failed to send message'};
+  //   }
+  // }
+
+  Future<List<Map<String, dynamic>>> getMessages(String roomName) async {
+    final url = Uri.parse('$baseUrl/chat/get-messages/?room_name=$roomName');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      print(json.decode(response.body));
+      // Access the 'messages_data' key, which should contain the list of messages
+      return List<Map<String, dynamic>>.from(responseData['messages_data']);
+    } else {
+      return [];
+    }
+  }
+
+
+
 }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart'; // Import your ApiService
-
+import 'api_service.dart';
+import 'custom_snackbar.dart';
 
 class ViewUser extends StatefulWidget {
   final String username;
@@ -14,12 +14,14 @@ class ViewUser extends StatefulWidget {
 class _ViewUserState extends State<ViewUser> {
   late Future<Map<String, dynamic>?> _profileDataFuture;
   bool _isExpanded = false;
-  double _swipeStart = 0.0;  // To track the start position of the swipe
+  double _swipeStart = 0.0; // To track the start position of the swipe
+  bool isMatchSent = false; // State variable to track match request status
+  final ApiService _apiService = ApiService(); // Create an instance of ApiService
 
   @override
   void initState() {
     super.initState();
-    _profileDataFuture = ApiService().loadProfile(widget.username); // Load profile data initially
+    _profileDataFuture = _apiService.loadProfile(widget.username); // Load profile data initially
   }
 
   String _getFieldValue(Map<String, dynamic>? data, String field) {
@@ -74,13 +76,61 @@ class _ViewUserState extends State<ViewUser> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _getFieldValue(profileData, 'name'),
-                          style: TextStyle(fontFamily: 'CustomFont2', color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Text(
+                              _getFieldValue(profileData, 'name'),
+                              style: TextStyle(fontFamily: 'CustomFont2', color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(width: 8),
+                            StatefulBuilder(
+                              builder: (context, setState) {
+                                return IconButton(
+                                  icon: AnimatedContainer(
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                    child: Icon(
+                                      isMatchSent ? Icons.favorite : Icons.favorite_border,
+                                      color: isMatchSent ? Colors.red : Colors.white,
+                                      size: 50,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    if (!isMatchSent) {
+                                      var response = await _apiService.sendMatchRequest(widget.username, profileData['username']);
+                                      if (response != null && response['message'] == 'Match request sent successfully.') {
+                                        setState(() {
+                                          isMatchSent = true;
+                                        });
+                                        CustomSnackbar.showSuccess(context, 'Match request sent to ${profileData['username']}');
+                                      } else if (response != null && response['message'] == 'Match request already accepted.') {
+                                        CustomSnackbar.showSuccess(context, 'Match request already accepted');
+                                      } else if (response != null && response['message'] == 'Match request already sent.') {
+                                        CustomSnackbar.showSuccess(context, 'Match request already sent');
+                                      } else {
+                                        CustomSnackbar.showError(context, 'Failed to send match request. Try again.');
+
+                                      }
+                                    } else {
+                                      var response = await _apiService.cancelMatchRequest(widget.username, profileData['username']);
+                                      if (response != null && response['message'] == 'Match request canceled successfully.') {
+                                        setState(() {
+                                          isMatchSent = false;
+                                        });
+                                        CustomSnackbar.showSuccess(context, 'Match request canceled');
+                                      } else {
+                                        CustomSnackbar.showError(context, 'Failed to cancel match request. Try again.');
+                                      }
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         ),
                         SizedBox(height: 8),
                         Text(
-                          '@ ${widget.username}',
+                          '@${widget.username}',
                           style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
                       ],
@@ -190,13 +240,14 @@ class _ViewUserState extends State<ViewUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(  // Add back button
+        leading: IconButton( // Add back button
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);  // Go back to previous page
+            Navigator.pop(context); // Go back to previous page
           },
         ),
-        title: Text( '${widget.username}',
+        title: Text(
+          '${widget.username}',
           style: TextStyle(
             fontSize: 28,
             fontFamily: 'CustomFont2',

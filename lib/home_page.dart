@@ -5,6 +5,7 @@ import 'messages_page.dart';
 import 'notification_page.dart';
 import 'view_user.dart';
 import 'api_service.dart';
+import 'custom_snackbar.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return _buildHomePage();
       case 1:
-        return MessagesPage();
+        return MessagesPage(username: widget.username);
       case 2:
         return NotificationPage();
       case 3:
@@ -137,6 +138,15 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Color.fromRGBO(153, 0, 76, 1),
         elevation: 4,
         actions: [
+          IconButton(
+            icon: Icon(Icons.interests_outlined, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchPage()),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.search_rounded, color: Colors.white),
             onPressed: () {
@@ -323,25 +333,52 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  IconButton(
-                    icon: Icon(
-                      isMatchSent ? Icons.favorite : Icons.favorite_border,
-                      color: isMatchSent ? Colors.red : Colors.white,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        isMatchSent = !isMatchSent;
-                      });
-                      if (isMatchSent) {
-                        print(
-                            "Match request sent to ${profile['username']}.");
-                      } else {
-                        print(
-                            "Match request removed for ${profile['username']}.");
-                      }
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      return IconButton(
+                        icon: AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: Icon(
+                            isMatchSent ? Icons.favorite : Icons.favorite_border,
+                            color: isMatchSent ? Colors.red : Colors.white,
+                            size: 50,
+                          ),
+                        ),
+                        onPressed: () async {
+                          if (!isMatchSent) {
+                            // Send match request
+                            var response = await _apiService.sendMatchRequest(widget.username, profile['username']);
+                            if (response != null && response['message'] == 'Match request sent successfully.') {
+                              setState(() {
+                                isMatchSent = true;
+                              });
+                              CustomSnackbar.showSuccess(context, 'Match request sent to ${profile['username']}');
+                            } else if (response != null && response['message'] == 'Match request already accepted.') {
+                              CustomSnackbar.showSuccess(context, 'Match request already accepted');
+                            } else if (response != null && response['message'] == 'Match request already sent.') {
+                              CustomSnackbar.showSuccess(context, 'Match request already sent');
+                            } else {
+                              CustomSnackbar.showError(context, 'Failed to send match request. Try again.');
+                            }
+                          } else {
+                            // Cancel match request
+                            var response = await _apiService.cancelMatchRequest(widget.username, profile['username']);
+                            if (response != null && response['message'] == 'Match request canceled successfully.') {
+                              setState(() {
+                                isMatchSent = false;
+                              });
+                              CustomSnackbar.showSuccess(context, 'Match request canceled');
+                            } else {
+                              CustomSnackbar.showError(context, 'Failed to cancel match request. Try again.');
+                            }
+                          }
+                        },
+                      );
                     },
                   ),
+
+
                 ],
               ),
             ),
