@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'home_page.dart';
+import 'custom_snackbar.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -27,8 +28,8 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
       duration: const Duration(seconds: 1),
       vsync: this,
     );
-    _logoSizeAnimation = Tween<double>(begin: 250, end: 300).animate(_controller);
-    _backgroundOpacityAnimation = Tween<double>(begin: 0.2, end: 0.6).animate(_controller);
+    _logoSizeAnimation = Tween<double>(begin: 200, end: 260).animate(_controller);
+    _backgroundOpacityAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(_controller);
     _controller.forward();
   }
 
@@ -49,14 +50,9 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
           AnimatedBuilder(
             animation: _backgroundOpacityAnimation,
             builder: (context, child) {
-              return ColorFiltered(
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(_backgroundOpacityAnimation.value),
-                  BlendMode.dstATop,
-                ),
-                child: Image.asset(
-                  'assets/bgimg11.jpg', // Path to your background image
-                  fit: BoxFit.cover,
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(_backgroundOpacityAnimation.value), // Animated opacity
                 ),
               );
             },
@@ -80,6 +76,16 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                       },
                     ),
                     SizedBox(height: 20),
+                    Text(
+                      'Begin Your Journey',
+                      style: TextStyle(
+                        fontFamily: 'CustomFont2',
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(153, 0, 76, 1),
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     Form(
                       key: _formKey,
                       child: Column(
@@ -171,19 +177,13 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                                 _formKey.currentState!.save();
                                 try {
                                   await apiService.registerUser(_username, _password);
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => HomePage(username: _username),
-                                  ));
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Failed to register user. Please try again.',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: Colors.black45,
-                                    ),
+                                  Navigator.of(context).pushReplacementNamed(
+                                    '/complete_profile',
+                                    arguments: _username,
                                   );
+                                  CustomSnackbar.showSuccess(context, 'Register Successful');
+                                } catch (e) {
+                                  CustomSnackbar.showError(context, 'Username Already Exists');
                                 }
                               }
                             },
@@ -192,6 +192,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
+                                fontFamily: 'CustomFont2',
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -214,7 +215,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                             child: Text(
                               'Already have an account? Log In',
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Color.fromRGBO(153, 0, 76, 1),
                                 fontSize: 16,
                               ),
                             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'custom_snackbar.dart';
 import 'api_service.dart'; // Assuming this service handles API calls
 
 class LoginPage extends StatefulWidget {
@@ -25,8 +26,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       duration: const Duration(seconds: 1),
       vsync: this,
     );
-    _logoSizeAnimation = Tween<double>(begin: 250, end: 300).animate(_controller);
-    _backgroundOpacityAnimation = Tween<double>(begin: 0.4, end: 0.6).animate(_controller);
+    _logoSizeAnimation = Tween<double>(begin: 200, end: 260).animate(_controller);
+    _backgroundOpacityAnimation = Tween<double>(begin: 0.9, end: 1).animate(_controller);
     _controller.forward();
   }
 
@@ -54,29 +55,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               builder: (context) => HomePage(username: _username),
             ),
           );
+          CustomSnackbar.showSuccess(context, 'Login Succesfull');
         } else {
-          // Show error if login failed
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Login failed! Please check your credentials.',
-                style: TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
-          );
+
+          CustomSnackbar.showError(context, 'Login Failed! Please check your credentials');
         }
       } catch (e) {
-        // Show error if an exception occurs
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'An error occurred. Please try again.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
+        CustomSnackbar.showError(context, 'An error occurred. Please try again.');
       } finally {
         setState(() {
           _isLoading = false;
@@ -94,20 +79,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           AnimatedBuilder(
             animation: _backgroundOpacityAnimation,
             builder: (context, child) {
-              return ColorFiltered(
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(_backgroundOpacityAnimation.value),
-                  BlendMode.dstATop,
-                ),
-                child: Image.asset(
-                  'assets/bgimg10.jpg', // Background image
-                  fit: BoxFit.cover,
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(_backgroundOpacityAnimation.value), // Animated opacity
                 ),
               );
             },
           ),
+
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(10.0),
             child: Center(
               child: SingleChildScrollView(
                 child: Column(
@@ -124,17 +105,27 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         );
                       },
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
+                    Text(
+                      'Welcome to',
+                      style: TextStyle(
+                        fontFamily: 'CustomFont2',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(153, 0, 76, 1),
+                      ),
+                    ),
+
                     Text(
                       'Biwah BandhaN',
                       style: TextStyle(
                         fontFamily: 'CustomFont3',
-                        fontSize: 55,
+                        fontSize: 50,
                         fontWeight: FontWeight.normal,
-                        color: Colors.pink,
+                        color: Color.fromRGBO(153, 0, 76, 1),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Form(
                       key: _formKey,
                       child: Column(
@@ -197,7 +188,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 ? CircularProgressIndicator(color: Colors.white)
                                 : Text(
                               'Login',
-                              style: TextStyle(fontSize: 20, color: Colors.white),
+                              style: TextStyle(fontFamily:'CustomFont2',fontSize: 20, color: Colors.white),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color.fromRGBO(153, 0, 76, 1),
@@ -219,7 +210,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             },
                             child: Text(
                               'Don\'t have an account? Sign Up',
-                              style: TextStyle(color: Colors.white, fontSize: 16),
+                              style: TextStyle(color: Color.fromRGBO(153, 0, 76, 1), fontSize: 16),
                             ),
                           ),
                         ],

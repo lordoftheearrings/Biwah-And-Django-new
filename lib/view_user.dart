@@ -109,7 +109,6 @@ class _ViewUserState extends State<ViewUser> {
                                         CustomSnackbar.showSuccess(context, 'Match request already sent');
                                       } else {
                                         CustomSnackbar.showError(context, 'Failed to send match request. Try again.');
-
                                       }
                                     } else {
                                       var response = await _apiService.cancelMatchRequest(widget.username, profileData['username']);
@@ -181,20 +180,77 @@ class _ViewUserState extends State<ViewUser> {
                       ],
                     ),
                     SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildInfoColumn('Bio', _getFieldValue(profileData, 'bio')),
+                        _buildInfoColumn('Phone', _getFieldValue(profileData, 'phone_number')),
+                      ],
+                    ),
                     if (_isExpanded) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildInfoColumn('Bio', _getFieldValue(profileData, 'bio')),
-                          _buildInfoColumn('Phone', _getFieldValue(profileData, 'phone_number')),
-                        ],
-                      ),
+
                       SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildInfoColumn('Religion', _getFieldValue(profileData, 'religion')),
                           _buildInfoColumn('Caste', _getFieldValue(profileData, 'caste')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Gotra', _getFieldValue(profileData, 'gotra')),
+                          _buildInfoColumn('Height', _getFieldValue(profileData, 'height')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Weight', _getFieldValue(profileData, 'weight')),
+                          _buildInfoColumn('Zodiac', _getFieldValue(profileData, 'zodiac')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Education', _getFieldValue(profileData, 'education')),
+                          _buildInfoColumn('Profession', _getFieldValue(profileData, 'profession')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Family Type', _getFieldValue(profileData, 'family_type')),
+                          _buildInfoColumn('Address', _getFieldValue(profileData, 'address')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Complexion', _getFieldValue(profileData, 'complexion')),
+                          _buildInfoColumn('Marital Status', _getFieldValue(profileData, 'marital_status')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Drinking Habits', _getFieldValue(profileData, 'habits_drinking')),
+                          _buildInfoColumn('Eating Habits', _getFieldValue(profileData, 'habits_eating')),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoColumn('Smoking Habits', _getFieldValue(profileData, 'habits_smoking')),
+                          // Add more fields if needed
                         ],
                       ),
                     ],

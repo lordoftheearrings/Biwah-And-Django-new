@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'api_service.dart';
 import 'dart:io';
+import 'home_page.dart';
 
-class EditProfilePage extends StatefulWidget {
+class CompleteProfilePage extends StatefulWidget {
   final String username;
 
-  EditProfilePage({required this.username});
+  CompleteProfilePage({required this.username});
 
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  _CompleteProfilePageState createState() => _CompleteProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _CompleteProfilePageState extends State<CompleteProfilePage> {
   final _formKey = GlobalKey<FormState>();
   String _name = '';
   String _phoneNumber = '';
@@ -135,7 +136,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       });
 
       if (success) {
-        Navigator.pop(context); // Go back to Profile Page
+        Navigator.pushReplacementNamed(context, '/home', arguments: widget.username); // Go to Home Page
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save profile')),
@@ -175,7 +176,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           },
         ),
         title: Text(
-          'Edit Profile',
+          'Complete Your Profile',
           style: TextStyle(
             fontFamily: 'CustomFont3', // Add custom font if needed
             fontSize: 30,

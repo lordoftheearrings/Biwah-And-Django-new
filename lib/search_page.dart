@@ -462,6 +462,3 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-// void main() => runApp(MaterialApp(
-//   home: SearchPage(),
-// ));
