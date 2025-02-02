@@ -19,13 +19,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _age = '';
   String _gender = 'Male';
   String _bio = '';
-  String _caste = 'Other';
-  String _religion = 'Other';
-  String _gotra = 'Bharadwaj';
+  String _caste = 'Bahun'; // Default value for caste
+  String _religion = 'Hindu'; // Default value for religion
+  String _gotra = 'Bharadwaj'; // Default value for gotra
   String _height = '';
   String _weight = '';
   String _zodiac = 'Mesha';
-  String _education = '';
+  String _education = 'SEE'; // Default value for education
   String _profession = '';
   String _familyType = 'Nuclear';
   String _address = '';
@@ -60,17 +60,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ? profileData['gender']
               : 'Male';
           _bio = profileData['bio'] ?? '';
-          _caste = ['Bharadwaj', 'Kashyap', 'Vashishtha', 'Vishwamitra', 'Gautam', 'Jamadagni', 'Atri', 'Agastya', 'Bhrigu', 'Angirasa', 'Parashar', 'Mudgala', 'Other'].contains(profileData['caste']) ? profileData['caste']
-              : 'Other';
-          _religion = ['Hindu', 'Muslim', 'Christian', 'Buddhism', 'Jewish', 'Other'].contains(profileData['religion']) ? profileData['religion']
-              : 'Other';
+          _caste = [ 'Bahun',
+            'Chhetri',
+            'Thakuri',
+            'Magar',
+            'Tharu',
+            'Tamang',
+            'Newar',
+            'Rai',
+            'Gurung',
+            'Limbu',
+            'Sherpa',
+            'Yadav',
+            'Kami',
+            'Damai',
+            'Sarki'].contains(profileData['caste']) ? profileData['caste']
+              : 'Bahun';
+          _religion = ['Hindu', 'Islam', 'Christian', 'Buddhist', 'Jain', 'Kiranti'].contains(profileData['religion']) ? profileData['religion']
+              : 'Hindu';
           _gotra = ['Bharadwaj', 'Kashyap', 'Vashishtha', 'Vishwamitra', 'Gautam', 'Jamadagni', 'Atri', 'Agastya', 'Bhrigu', 'Angirasa', 'Parashar', 'Mudgala', 'Other'].contains(profileData['gotra']) ? profileData['gotra']
               : 'Bharadwaj';
           _height = profileData['height']?.toString() ?? '';
           _weight = profileData['weight']?.toString() ?? '';
           _zodiac = ['Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya', 'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena'].contains(profileData['zodiac']) ? profileData['zodiac']
               : 'Mesha';
-          _education = profileData['education'] ?? '';
+          _education = ['SEE', 'High School or +2', 'Diploma', 'Bachelors', 'Masters', 'PhD'].contains(profileData['education']) ? profileData['education']
+              : 'SEE';
           _profession = profileData['profession'] ?? '';
           _familyType = ['Nuclear', 'Joint'].contains(profileData['family_type']) ? profileData['family_type']
               : 'Nuclear';
@@ -166,7 +181,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(68, 29, 47, 1.0), // Set background color to black
+      backgroundColor: Colors.white, // Set background color to white
       appBar: AppBar(
         leading: IconButton(  // Add back button
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -212,7 +227,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Profile Image', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              Text('Profile Image', style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1))),
               Center(
                 child: GestureDetector(
                   onTap: () => _pickImage(true),
@@ -228,7 +243,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               SizedBox(height: 25),
-              Text('Cover Image', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              Text('Cover Image', style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1))),
               SizedBox(height: 15),
               GestureDetector(
                 onTap: () => _pickImage(false),
@@ -255,15 +270,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _name,
                 decoration: InputDecoration(
                   labelText: 'Name',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 onSaved: (value) => _name = value!,
               ),
               SizedBox(height: 16),
@@ -271,15 +286,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _phoneNumber,
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 keyboardType: TextInputType.number,
                 onSaved: (value) => _phoneNumber = value!,
               ),
@@ -288,15 +303,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _age,
                 decoration: InputDecoration(
                   labelText: 'Age',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 keyboardType: TextInputType.number,
                 onSaved: (value) => _age = value!,
               ),
@@ -305,26 +320,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _gender,
                 decoration: InputDecoration(
                   labelText: 'Gender',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
                 onChanged: (newValue) {
                   setState(() {
                     _gender = newValue!;
                   });
                 },
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Male', 'Female', 'Other']
                     .map((gender) => DropdownMenuItem(
                   value: gender,
-                  child: Text(gender, style: TextStyle(color: Colors.white)),
+                  child: Text(gender, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
               ),
@@ -333,69 +348,83 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _caste,
                 decoration: InputDecoration(
                   labelText: 'Caste',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                items: ['Bharadwaj', 'Kashyap', 'Vashishtha', 'Vishwamitra', 'Gautam', 'Jamadagni', 'Atri', 'Agastya', 'Bhrigu', 'Angirasa', 'Parashar', 'Mudgala', 'Other']
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
+                items: [ 'Bahun',
+                  'Chhetri',
+                  'Thakuri',
+                  'Magar',
+                  'Tharu',
+                  'Tamang',
+                  'Newar',
+                  'Rai',
+                  'Gurung',
+                  'Limbu',
+                  'Sherpa',
+                  'Yadav',
+                  'Kami',
+                  'Damai',
+                  'Sarki']
                     .map((caste) => DropdownMenuItem(
                   value: caste,
-                  child: Text(caste, style: TextStyle(color: Colors.white)),
+                  child: Text(caste, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
-                onChanged: (value) => setState(() => _caste = value ?? 'Other'),
+                onChanged: (value) => setState(() => _caste = value ?? 'Bahun'),
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _religion,
                 decoration: InputDecoration(
                   labelText: 'Religion',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                items: ['Hindu', 'Muslim', 'Christian', 'Buddhism', 'Jewish', 'Other']
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
+                items: ['Hindu', 'Islam', 'Christian', 'Buddhist', 'Jain', 'Kiranti']
                     .map((religion) => DropdownMenuItem(
                   value: religion,
-                  child: Text(religion, style: TextStyle(color: Colors.white)),
+                  child: Text(religion, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
-                onChanged: (value) => setState(() => _religion = value ?? 'Other'),
+                onChanged: (value) => setState(() => _religion = value ?? 'Hindu'),
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _gotra,
                 decoration: InputDecoration(
                   labelText: 'Gotra',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Bharadwaj', 'Kashyap', 'Vashishtha', 'Vishwamitra', 'Gautam', 'Jamadagni', 'Atri', 'Agastya', 'Bhrigu', 'Angirasa', 'Parashar', 'Mudgala', 'Other']
                     .map((gotra) => DropdownMenuItem(
                   value: gotra,
-                  child: Text(gotra, style: TextStyle(color: Colors.white)),
+                  child: Text(gotra, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _gotra = value ?? 'Bharadwaj'),
@@ -405,15 +434,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _height,
                 decoration: InputDecoration(
                   labelText: 'Height (cm)',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 keyboardType: TextInputType.number,
                 onSaved: (value) => _height = value!,
               ),
@@ -422,15 +451,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _weight,
                 decoration: InputDecoration(
                   labelText: 'Weight (kg)',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 keyboardType: TextInputType.number,
                 onSaved: (value) => _weight = value!,
               ),
@@ -439,56 +468,63 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _zodiac,
                 decoration: InputDecoration(
                   labelText: 'Zodiac',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                items: ['Mesha(Aries)', 'Vrish(Taurus)', 'Mithun(Gemini)', 'Karkat(Cancer)', 'Simha(Leo)', 'Kanya(Virgo)', 'Tula(Libra)', 'Vrischika(Scorpio)', 'Dhanu(Sagittarius)', 'Makara(Capricorn)', 'Kumbha(Aquarius)', 'Meen(Pisces)']
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
+                items: ['Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya', 'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena']
                     .map((zodiac) => DropdownMenuItem(
                   value: zodiac,
-                  child: Text(zodiac, style: TextStyle(color: Colors.white)),
+                  child: Text(zodiac, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _zodiac = value ?? 'Mesha'),
               ),
               SizedBox(height: 16),
-              TextFormField(
-                initialValue: _education,
+              DropdownButtonFormField<String>(
+                value: _education,
                 decoration: InputDecoration(
                   labelText: 'Education',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
-                maxLines: 3,
-                onSaved: (value) => _education = value!,
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
+                items: ['SEE', 'High School or +2', 'Diploma', 'Bachelors', 'Masters', 'PhD']
+                    .map((education) => DropdownMenuItem(
+                  value: education,
+                  child: Text(education, style: TextStyle(color: Colors.black)),
+                ))
+                    .toList(),
+                onChanged: (value) => setState(() => _education = value ?? 'SEE'),
               ),
               SizedBox(height: 16),
               TextFormField(
                 initialValue: _profession,
                 decoration: InputDecoration(
                   labelText: 'Profession',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 onSaved: (value) => _profession = value!,
               ),
               SizedBox(height: 16),
@@ -496,21 +532,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _familyType,
                 decoration: InputDecoration(
                   labelText: 'Family Type',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Nuclear', 'Joint']
                     .map((familyType) => DropdownMenuItem(
                   value: familyType,
-                  child: Text(familyType, style: TextStyle(color: Colors.white)),
+                  child: Text(familyType, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _familyType = value ?? 'Nuclear'),
@@ -520,15 +556,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _address,
                 decoration: InputDecoration(
                   labelText: 'Address',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 maxLines: 3,
                 onSaved: (value) => _address = value!,
               ),
@@ -537,15 +573,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _complexion,
                 decoration: InputDecoration(
                   labelText: 'Complexion',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 onSaved: (value) => _complexion = value!,
               ),
               SizedBox(height: 16),
@@ -553,21 +589,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _maritalStatus,
                 decoration: InputDecoration(
                   labelText: 'Marital Status',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Single', 'Divorce', 'Married']
                     .map((maritalStatus) => DropdownMenuItem(
                   value: maritalStatus,
-                  child: Text(maritalStatus, style: TextStyle(color: Colors.white)),
+                  child: Text(maritalStatus, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _maritalStatus = value ?? 'Single'),
@@ -577,21 +613,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _habitsDrinking,
                 decoration: InputDecoration(
                   labelText: 'Drinking Habits',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Alcoholic', 'Non-Alcoholic']
                     .map((habitsDrinking) => DropdownMenuItem(
                   value: habitsDrinking,
-                  child: Text(habitsDrinking, style: TextStyle(color: Colors.white)),
+                  child: Text(habitsDrinking, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _habitsDrinking = value ?? 'Non-Alcoholic'),
@@ -601,21 +637,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _habitsEating,
                 decoration: InputDecoration(
                   labelText: 'Eating Habits',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Veg', 'Non-Veg']
                     .map((habitsEating) => DropdownMenuItem(
                   value: habitsEating,
-                  child: Text(habitsEating, style: TextStyle(color: Colors.white)),
+                  child: Text(habitsEating, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _habitsEating = value ?? 'Veg'),
@@ -625,21 +661,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: _habitsSmoking,
                 decoration: InputDecoration(
                   labelText: 'Smoking Habits',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.white,
+                style: TextStyle(color: Colors.black),
+                icon: Icon(Icons.arrow_drop_down, color: Color.fromRGBO(153, 0, 76, 1)),
                 items: ['Smoker', 'Non-Smoker']
                     .map((habitsSmoking) => DropdownMenuItem(
                   value: habitsSmoking,
-                  child: Text(habitsSmoking, style: TextStyle(color: Colors.white)),
+                  child: Text(habitsSmoking, style: TextStyle(color: Colors.black)),
                 ))
                     .toList(),
                 onChanged: (value) => setState(() => _habitsSmoking = value ?? 'Non-Smoker'),
@@ -649,15 +685,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: _bio,
                 decoration: InputDecoration(
                   labelText: 'Bio',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(153, 0, 76, 1)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Color.fromRGBO(153, 0, 76, 1)),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 maxLines: 3,
                 onSaved: (value) => _bio = value!,
               ),

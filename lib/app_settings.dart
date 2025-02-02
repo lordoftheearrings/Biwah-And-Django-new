@@ -100,7 +100,7 @@ class _AppSettingsState extends State<AppSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(68, 29, 47, 1.0),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(  // Add back button
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -160,7 +160,7 @@ class _AppSettingsState extends State<AppSettings> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color.fromRGBO(153, 0, 76, 1),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -173,7 +173,7 @@ class _AppSettingsState extends State<AppSettings> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: Color.fromRGBO(153, 0, 76, 1), size: 30),
+            Icon(icon, color: Colors.white, size: 30),
             SizedBox(width: 20),
             Text(
               title,
@@ -181,7 +181,7 @@ class _AppSettingsState extends State<AppSettings> {
                 fontFamily: 'CustomFont2',
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
           ],

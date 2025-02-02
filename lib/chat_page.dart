@@ -131,14 +131,14 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Color.fromRGBO(153, 0, 76, 1),
         actions: [
           IconButton(
-            icon: Icon(Icons.call),
+            icon: Icon(Icons.call,color: Colors.white),
             onPressed: () {
               // Add call logic here
             },
             tooltip: 'Call',
           ),
           IconButton(
-            icon: Icon(Icons.videocam),
+            icon: Icon(Icons.videocam,color: Colors.white),
             onPressed: () {
               // Add video call logic here
             },
@@ -162,7 +162,8 @@ class _ChatPageState extends State<ChatPage> {
                 },
               ),
             ),
-            Padding(
+            Container(
+              color: Color.fromRGBO(153, 0, 76, 1), // Set your desired background color
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
@@ -171,11 +172,11 @@ class _ChatPageState extends State<ChatPage> {
                       controller: _controller,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Color.fromRGBO(153, 0, 76, 1),
+                        fillColor: Colors.white,
                         hintText: 'Type a message...',
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(color: Colors.blueGrey),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
+                          borderRadius: BorderRadius.circular(30.0),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -187,7 +188,8 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ],
               ),
-            ),
+            )
+
           ],
         ),
       ),
@@ -202,12 +204,12 @@ class _ChatPageState extends State<ChatPage> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
           decoration: BoxDecoration(
-            color: isSent ? Color.fromRGBO(153, 0, 76, 1) : Colors.grey,
+            color: isSent ? Color.fromRGBO(153, 0, 76, 1) : Colors.grey[400],
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             message,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style:isSent ? TextStyle(color: Colors.white, fontSize: 16) : TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),
       ),

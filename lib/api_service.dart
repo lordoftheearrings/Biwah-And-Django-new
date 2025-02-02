@@ -172,7 +172,7 @@ class ApiService {
           'hour': hour,
           'minute': minute,
           'second': second,
-          'latitude': latitude,
+          'latitude': 65.0,
           'longitude': longitude,
           'birth_location': birthLocation,
         }),
@@ -237,7 +237,7 @@ class ApiService {
           'hour_boy': boyDetails['hour'],
           'minute_boy': boyDetails['minute'],
           'second_boy': boyDetails['second'],
-          'latitude_boy': boyDetails['latitude'],
+          'latitude_boy': 65.0,
           'longitude_boy': boyDetails['longitude'],
           'year_girl': girlDetails['year'],
           'month_girl': girlDetails['month'],
@@ -245,7 +245,7 @@ class ApiService {
           'hour_girl': girlDetails['hour'],
           'minute_girl': girlDetails['minute'],
           'second_girl': girlDetails['second'],
-          'latitude_girl': girlDetails['latitude'],
+          'latitude_girl': 65.0,
           'longitude_girl': girlDetails['longitude'],
         }),
       );
@@ -261,6 +261,40 @@ class ApiService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>> searchUsers({
+    required String searchTerm,
+    int? ageMin,
+    int? ageMax,
+    String? gender,
+    String? religion,
+    String? caste,
+    String? gotra,
+    int page = 1,
+  }) async {
+    final uri = Uri.parse('$baseUrl/biwah/search/').replace(queryParameters: {
+      'search': searchTerm,
+      if (ageMin != null) 'age_min': ageMin.toString(),
+      if (ageMax != null) 'age_max': ageMax.toString(),
+      if (gender != null && gender != 'Any') 'gender': gender,
+      if (religion != null && religion != 'Any') 'religion': religion,
+      if (caste != null && caste != 'Any') 'caste': caste,
+      if (gotra != null && gotra != 'Any') 'gotra': gotra,
+      'page': page.toString(),
+    });
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load users');
+    }
+  }
+
+
+
+
 
   Future<Map<String, dynamic>> sendMatchRequest(String senderUsername,String receiverUsername) async {
     final url = Uri.parse('$baseUrl/chat/send_match_request/');

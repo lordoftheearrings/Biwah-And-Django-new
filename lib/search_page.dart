@@ -1,247 +1,7 @@
-// import 'package:flutter/material.dart';
-// import 'dart:ui';
-//
-// class SearchPage extends StatefulWidget {
-//   @override
-//   _SearchPageState createState() => _SearchPageState();
-// }
-//
-// class _SearchPageState extends State<SearchPage> {
-//   final TextEditingController _searchController = TextEditingController();
-//   List<String> _searchResults = [];
-//   String _selectedGender = 'Any';
-//   String _selectedAgeGroup = 'Any';
-//   String _selectedReligion = 'Any';
-//   String _selectedCaste = 'Any';
-//   String _selectedEducationalLevel = 'Any';
-//   String _selectedProfession = 'Any';
-//
-//   final List<String> _genders = ['Any', 'Male', 'Female', 'Other'];
-//   final List<String> _ageGroups = ['Any', '18-25', '26-35', '36-45', '46+'];
-//   final List<String> _religions = ['Any', 'Christianity', 'Islam', 'Hinduism', 'Buddhism', 'Other'];
-//   final List<String> _castes = ['Any', 'Brahmin', 'Kshatriya', 'Vaishya', 'Shudra', 'Other'];
-//   final List<String> _educationalLevels = ['Any', 'High School', 'Undergraduate', 'Graduate', 'Postgraduate'];
-//   final List<String> _professions = ['Any', 'Engineer', 'Doctor', 'Teacher', 'Lawyer', 'Other'];
-//
-//   void _search() {
-//     if (_searchController.text.isNotEmpty) {
-//       // Perform the search
-//       setState(() {
-//         _searchResults = List.generate(10, (index) {
-//           return 'Result $index for "${_searchController.text}" (Gender: $_selectedGender, Age Group: $_selectedAgeGroup, Religion: $_selectedReligion, Caste: $_selectedCaste, Educational Level: $_selectedEducationalLevel, Profession: $_selectedProfession)';
-//         });
-//       });
-//       Navigator.pop(context); // Close the bottom sheet after searching
-//     } else {
-//       // Show an error message or do nothing if the search field is empty
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text('Please enter a search query'),
-//         ),
-//       );
-//     }
-//   }
-//
-//   void _showFilterBottomSheet(BuildContext context) {
-//     showModalBottomSheet(
-//       context: context,
-//       backgroundColor: Colors.transparent,
-//       builder: (BuildContext context) {
-//         return StatefulBuilder(
-//           builder: (BuildContext context, StateSetter setState) {
-//             return Container(
-//               padding: EdgeInsets.all(20.0),
-//               decoration: BoxDecoration(
-//                 color: Color.fromRGBO(153, 0, 76, 1), // Background color of the bottom sheet
-//                 borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-//               ),
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: <Widget>[
-//                   Text('Filter By:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'CustomFont2')),
-//                   SizedBox(height: 16),
-//                   _buildDropdownRow('Gender:', _selectedGender, _genders, (newValue) {
-//                     setState(() {
-//                       _selectedGender = newValue!;
-//                     });
-//                   }),
-//                   _buildDropdownRow('Age Group:', _selectedAgeGroup, _ageGroups, (newValue) {
-//                     setState(() {
-//                       _selectedAgeGroup = newValue!;
-//                     });
-//                   }),
-//                   _buildDropdownRow('Religion:', _selectedReligion, _religions, (newValue) {
-//                     setState(() {
-//                       _selectedReligion = newValue!;
-//                     });
-//                   }),
-//                   _buildDropdownRow('Caste:', _selectedCaste, _castes, (newValue) {
-//                     setState(() {
-//                       _selectedCaste = newValue!;
-//                     });
-//                   }),
-//                   _buildDropdownRow('Educational Level:', _selectedEducationalLevel, _educationalLevels, (newValue) {
-//                     setState(() {
-//                       _selectedEducationalLevel = newValue!;
-//                     });
-//                   }),
-//                   _buildDropdownRow('Profession:', _selectedProfession, _professions, (newValue) {
-//                     setState(() {
-//                       _selectedProfession = newValue!;
-//                     });
-//                   }),
-//                   SizedBox(height: 16),
-//                   Align(
-//                     alignment: Alignment.center,
-//                     child: ElevatedButton(
-//                       onPressed: _search,
-//                       child: Text('Apply Filters', style: TextStyle(color: Colors.black)),
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color.fromRGBO(255, 182, 193, 1), // Button color
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(8.0), // Rounded corners
-//                         ),
-//                         padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }
-//
-//   Widget _buildDropdownRow(String label, String selectedValue, List<String> values, ValueChanged<String?> onChanged) {
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 8.0),
-//       child: Row(
-//         children: [
-//           Expanded(
-//             flex: 2,
-//             child: Text(label, style: TextStyle(fontSize: 16, color: Colors.white)),
-//           ),
-//           Expanded(
-//             flex: 3,
-//             child: DropdownButton<String>(
-//               value: selectedValue,
-//               onChanged: (String? newValue) {
-//                 onChanged(newValue);
-//                 // Ensure the dropdown reflects the change immediately
-//                 setState(() {});
-//               },
-//               items: values.map<DropdownMenuItem<String>>((String value) {
-//                 return DropdownMenuItem<String>(
-//                   value: value,
-//                   child: Text(value),
-//                 );
-//               }).toList(),
-//               isExpanded: true,
-//               underline: Container(), // Remove the underline
-//               style: TextStyle(color: Colors.black), // Dropdown text color
-//               dropdownColor: Colors.white, // Dropdown menu background color
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       extendBodyBehindAppBar: true,
-//       body: Stack(
-//         children: [
-//           // Black background container
-//           Container(
-//             color: Colors.black, // Fully black background
-//           ),
-//           // PNG image with color filter
-//           Container(
-//             decoration: BoxDecoration(
-//               image: DecorationImage(
-//                 image: AssetImage('assets/bridegroom2.png'),
-//                 fit: BoxFit.cover,
-//                 colorFilter: ColorFilter.mode(
-//                   Colors.black.withOpacity(0.5), // Darker color overlay
-//                   BlendMode.srcOver, // Use srcOver mode to overlay black color
-//                 ),
-//               ),
-//             ),
-//             child: BackdropFilter(
-//               filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-//               child: Container(
-//                 color: Colors.black.withOpacity(0.4), // Darker overlay
-//               ),
-//             ),
-//           ),
-//           SafeArea(
-//             child: Column(
-//               children: [
-//                 Padding(
-//                   padding: const EdgeInsets.all(8.0),
-//                   child: Row(
-//                     children: [
-//                       Expanded(
-//                         child: TextField(
-//                           controller: _searchController,
-//                           decoration: InputDecoration(
-//                             hintText: 'Search',
-//                             hintStyle: TextStyle(fontFamily: 'CustomFont2'),
-//                             suffixIcon: Row(
-//                               mainAxisSize: MainAxisSize.min,
-//                               children: [
-//                                 IconButton(
-//                                   icon: Icon(Icons.search, color: Colors.black),
-//                                   onPressed: _search,
-//                                 ),
-//                                 IconButton(
-//                                   icon: Icon(Icons.filter_list, color: Colors.black),
-//                                   onPressed: () => _showFilterBottomSheet(context),
-//                                 ),
-//                               ],
-//                             ),
-//                             filled: true,
-//                             fillColor: Colors.white.withOpacity(0.85),
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(15.0),
-//                               borderSide: BorderSide.none,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 Expanded(
-//                   child: ListView.builder(
-//                     itemCount: _searchResults.length,
-//                     itemBuilder: (context, index) {
-//                       return ListTile(
-//                         title: Text(_searchResults[index]),
-//                       );
-//                     },
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-//
-// void main() => runApp(MaterialApp(
-//   home: SearchPage(),
-// ));
-
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'api_service.dart';
+import 'view_user.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -250,30 +10,38 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<String> _searchResults = [];
+  List<dynamic> _searchResults = [];
   String _selectedGender = 'Any';
-  String _selectedAgeGroup = 'Any';
   String _selectedReligion = 'Any';
+  String _selectedCaste = 'Any';
+  String _selectedGotra = 'Any';
+  RangeValues _ageRange = RangeValues(18, 30);
+
+  final ApiService _apiService = ApiService();
 
   final List<String> _genders = ['Any', 'Male', 'Female', 'Other'];
-  final List<String> _ageGroups = ['Any', '18-25', '26-35', '36-45', '46+'];
-  final List<String> _religions = ['Any', 'Christianity', 'Islam', 'Hinduism', 'Buddhism', 'Other'];
+  final List<String> _religions = ['Any', 'Hindu', 'Buddhist', 'Islam', 'Christian', 'Jain', 'Kiranti'];
+  final List<String> _castes = ['Any', 'Bahun', 'Chhetri', 'Thakuri', 'Magar', 'Tharu', 'Tamang', 'Newar', 'Rai', 'Gurung', 'Limbu', 'Sherpa', 'Yadav', 'Kami', 'Damai', 'Sarki'];
+  final List<String> _gotras = ['Any', 'Bharadwaj', 'Kashyap', 'Vashishtha', 'Vishwamitra', 'Gautam', 'Jamadagni', 'Atri', 'Agastya', 'Bhrigu', 'Angirasa', 'Parashar', 'Mudgala'];
 
-  void _search() {
-    if (_searchController.text.isNotEmpty) {
-      // Perform the search (mocked results)
+  void _search() async {
+    try {
+      final data = await _apiService.searchUsers(
+        searchTerm: _searchController.text,
+        ageMin: _ageRange.start.round(),
+        ageMax: _ageRange.end.round(),
+        gender: _selectedGender,
+        religion: _selectedReligion,
+        caste: _selectedCaste,
+        gotra: _selectedGotra,
+      );
+      print('API Response: $data'); // Debug API response
       setState(() {
-        _searchResults = List.generate(10, (index) {
-          return 'User $index for "${_searchController.text}" (Gender: $_selectedGender, Age Group: $_selectedAgeGroup, Religion: $_selectedReligion)';
-        });
+        _searchResults = data['users'];
       });
-    } else {
-      // Show an error message or do nothing if the search field is empty
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter a search query', style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red, // Dark background for visibility
-        ),
+        SnackBar(content: Text('Error fetching search results', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
       );
     }
   }
@@ -295,23 +63,28 @@ class _SearchPageState extends State<SearchPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Filter By:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'CustomFont2')),
+                  Text('Filter By:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  _buildDropdownRow('Gender:', _selectedGender, _genders, (newValue) => setState(() => _selectedGender = newValue!)),
+                  _buildDropdownRow('Religion:', _selectedReligion, _religions, (newValue) => setState(() => _selectedReligion = newValue!)),
+                  _buildDropdownRow('Caste:', _selectedCaste, _castes, (newValue) => setState(() => _selectedCaste = newValue!)),
+                  _buildDropdownRow('Gotra:', _selectedGotra, _gotras, (newValue) => setState(() => _selectedGotra = newValue!)),
                   SizedBox(height: 16),
-                  _buildDropdownRow('Gender:', _selectedGender, _genders, (newValue) {
-                    setState(() {
-                      _selectedGender = newValue!;
-                    });
-                  }),
-                  _buildDropdownRow('Age Group:', _selectedAgeGroup, _ageGroups, (newValue) {
-                    setState(() {
-                      _selectedAgeGroup = newValue!;
-                    });
-                  }),
-                  _buildDropdownRow('Religion:', _selectedReligion, _religions, (newValue) {
-                    setState(() {
-                      _selectedReligion = newValue!;
-                    });
-                  }),
+                  Text('Age Group:', style: TextStyle(fontSize: 16, color: Colors.white)),
+                  RangeSlider(
+                    values: _ageRange,
+                    min: 18,
+                    max: 100,
+                    divisions: 82,
+                    labels: RangeLabels(
+                      _ageRange.start.round().toString(),
+                      _ageRange.end.round().toString(),
+                    ),
+                    onChanged: (RangeValues values) {
+                      setState(() {
+                        _ageRange = values;
+                      });
+                    },
+                  ),
                   SizedBox(height: 16),
                   Align(
                     alignment: Alignment.center,
@@ -320,10 +93,7 @@ class _SearchPageState extends State<SearchPage> {
                       child: Text('Apply Filters', style: TextStyle(color: Colors.black)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(255, 182, 193, 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                       ),
                     ),
                   ),
@@ -337,37 +107,26 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildDropdownRow(String label, String selectedValue, List<String> values, ValueChanged<String?> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(label, style: TextStyle(fontSize: 16, color: Colors.white)),
+    return Row(
+      children: [
+        Expanded(flex: 2, child: Text(label, style: TextStyle(fontSize: 16, color: Colors.white))),
+        Expanded(
+          flex: 3,
+          child: DropdownButton<String>(
+            value: selectedValue,
+            onChanged: onChanged,
+            items: values.map((value) => DropdownMenuItem(value: value, child: Text(value, style: TextStyle(color: Colors.white)))).toList(),
+            isExpanded: true,
+            underline: Container(),
+            dropdownColor: Colors.black,
           ),
-          Expanded(
-            flex: 3,
-            child: DropdownButton<String>(
-              value: selectedValue,
-              onChanged: (String? newValue) {
-                onChanged(newValue);
-                setState(() {});
-              },
-              items: values.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: TextStyle(color: Colors.white)), // White text color for consistency
-                );
-              }).toList(),
-              isExpanded: true,
-              underline: Container(),
-              style: TextStyle(color: Colors.black),
-              dropdownColor: Colors.black,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
+  }
+
+  void _navigateToViewUserPage(dynamic user) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ViewUser(username: user['username'])));
   }
 
   @override
@@ -376,9 +135,7 @@ class _SearchPageState extends State<SearchPage> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          Container(
-            color: Colors.black,
-          ),
+          Container(color: Colors.black),
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -401,7 +158,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Expanded(
@@ -409,35 +166,17 @@ class _SearchPageState extends State<SearchPage> {
                           controller: _searchController,
                           decoration: InputDecoration(
                             hintText: 'Search',
-                            hintStyle: TextStyle(fontFamily: 'CustomFont2', color: Colors.black), // White hint text
                             suffixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                IconButton(
-                                  icon: Icon(Icons.search, color: Colors.black),
-                                  onPressed: _search,
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.filter_list, color: Colors.black),
-                                  onPressed: () => _showFilterBottomSheet(context),
-                                ),
+                                IconButton(icon: Icon(Icons.search, color: Colors.black), onPressed: _search),
+                                IconButton(icon: Icon(Icons.filter_list, color: Colors.black), onPressed: () => _showFilterBottomSheet(context)),
                               ],
                             ),
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.85),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                              borderSide: BorderSide.none,
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0), borderSide: BorderSide.none),
                           ),
-                          onChanged: (query) {
-                            // Show search results as dropdown
-                            setState(() {
-                              _searchResults = List.generate(10, (index) {
-                                return 'User $index for "$query"';
-                              });
-                            });
-                          },
                         ),
                       ),
                     ],
@@ -447,8 +186,41 @@ class _SearchPageState extends State<SearchPage> {
                   child: ListView.builder(
                     itemCount: _searchResults.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(_searchResults[index], style: TextStyle(color: Colors.white)), // Ensure search results text is white
+                      final user = _searchResults[index];
+                      return FutureBuilder<Map<String, dynamic>?>(
+                        future: _apiService.loadProfile(user['username']),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return ListTile(
+                              title: Text('Loading...', style: TextStyle(color: Colors.white)),
+                            );
+                          }
+
+                          if (snapshot.hasError || !snapshot.hasData) {
+                            return ListTile(
+                              title: Text('Error loading profile', style: TextStyle(color: Colors.white)),
+                            );
+                          }
+
+                          final profileData = snapshot.data!;
+                          final name = profileData['name'] ?? 'N/A';
+                          final profileImage = profileData['profile_image'] ?? '';
+                          final username = profileData['username'] ?? 'N/A';
+
+                          return Column(
+                            children: [
+                              ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: profileImage.isNotEmpty ? NetworkImage(profileImage) : null,
+                                ),
+                                title: Text(name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                subtitle: Text(username, style: TextStyle(color: Colors.white)),
+                                onTap: () => _navigateToViewUserPage(user),
+                              ),
+                              Divider(color: Colors.white.withOpacity(0.5)),
+                            ],
+                          );
+                        },
                       );
                     },
                   ),
@@ -461,4 +233,3 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 }
-

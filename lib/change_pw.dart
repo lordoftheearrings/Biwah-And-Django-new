@@ -18,7 +18,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(68, 29, 47, 1.0),
+      backgroundColor: Colors.white,
       appBar: AppBar(
       leading: IconButton(
         icon: Icon(Icons.arrow_back_ios, color: Colors.white),

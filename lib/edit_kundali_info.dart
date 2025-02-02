@@ -33,13 +33,13 @@ class _EditKundaliInfoPageState extends State<EditKundaliInfoPage> {
   void initState() {
     super.initState();
     if (widget.kundaliInfo != null) {
-      yearController.text = widget.kundaliInfo?['year']?.toString() ?? '';
+      yearController.text = '2001';
       monthController.text = widget.kundaliInfo?['month']?.toString() ?? '';
       dayController.text = widget.kundaliInfo?['day']?.toString() ?? '';
       hourController.text = widget.kundaliInfo?['hour']?.toString() ?? '';
       minuteController.text = widget.kundaliInfo?['minute']?.toString() ?? '';
       secondController.text = widget.kundaliInfo?['second']?.toString() ?? '';
-      latitudeController.text = widget.kundaliInfo?['latitude']?.toString() ?? '';
+      latitudeController.text = widget.kundaliInfo?['latitude']?.toString() ?? '65.0';
       longitudeController.text = widget.kundaliInfo?['longitude']?.toString() ?? '';
       birthLocationController.text = widget.kundaliInfo?['birthLocation'] ?? '';
     }
