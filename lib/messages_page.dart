@@ -23,6 +23,7 @@ class _MessagesPageState extends State<MessagesPage> {
     _fetchChatRooms();
   }
 
+
   Future<void> _fetchChatRooms() async {
     try {
       final response = await ApiService().fetchChatRooms(widget.username);
@@ -47,6 +48,7 @@ class _MessagesPageState extends State<MessagesPage> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

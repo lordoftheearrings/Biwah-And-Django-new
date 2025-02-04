@@ -1,3 +1,4 @@
+import 'set_preferences.dart';
 import 'package:flutter/material.dart';
 import 'profile_page.dart';
 import 'search_page.dart';
@@ -143,7 +144,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchPage()),
+                MaterialPageRoute(builder: (context) => SetPreferencePage()),
               );
             },
           ),
