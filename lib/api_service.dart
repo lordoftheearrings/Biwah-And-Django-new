@@ -3,7 +3,7 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://192.168.156.15:8000';
+  final String baseUrl = 'http://127.0.0.1:8000';
 
   // Register User
   Future<void> registerUser(String username, String password) async {
@@ -438,6 +438,85 @@ class ApiService {
       return List<Map<String, dynamic>>.from(responseData['messages_data']);
     } else {
       return [];
+    }
+  }
+
+
+  Future<List<dynamic>> fetchNotifications(String username) async {
+    final response = await http.get(Uri.parse('$baseUrl/chat/notifications/?username=$username'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['notifications'];
+    } else {
+      throw Exception('Failed to load notifications');
+    }
+  }
+
+
+  Future<bool> savePreferences(String username, Map<String, dynamic> preferencesData) async {
+    final url = Uri.parse('$baseUrl/biwah/save-preferences/'); // Replace with actual server URL
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          'username': username,
+          'p_age_min': preferencesData['age_range']['min'],
+          'p_age_max': preferencesData['age_range']['max'],
+          'p_religion': preferencesData['religion'],
+          'p_caste': preferencesData['caste'],
+          'p_gotra': preferencesData['gotra'],
+          'p_height_min': preferencesData['height_range']['min'],
+          'p_height_max': preferencesData['height_range']['max'],
+          'p_weight_min': preferencesData['weight_range']['min'],
+          'p_weight_max': preferencesData['weight_range']['max'],
+          'p_habits_drinking': preferencesData['drinking_habit'],
+          'p_habits_eating': preferencesData['eating_habit'],
+          'p_habits_smoking': preferencesData['smoking_habit'],
+          'p_zodiac': preferencesData['zodiac'],
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Preferences saved successfully!');
+        return true; // Return true on success
+      } else {
+        print('Failed to save preferences');
+        return false; // Return false on failure
+      }
+    } catch (e) {
+      print('Error saving preferences: $e');
+      return false; // Return false if there was an error
+    }
+  }
+
+  Future<bool> saveWeights(String username, Map<String, dynamic> weightsData) async {
+    try {
+      final url = Uri.parse('$baseUrl/biwah/save-weights/'); // Replace with actual server URL
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          'username': username,
+          'age_weight': weightsData['age_weight'],
+          'religion_weight': weightsData['religion_weight'],
+          'caste_weight': weightsData['caste_weight'],
+          'gotra_weight': weightsData['gotra_weight'],
+          'height_weight': weightsData['height_weight'],
+          'weight_weight': weightsData['weight_weight'],
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true; // Indicating success
+      } else {
+        return false; // Indicating failure
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false; // Indicating error in API call
     }
   }
 

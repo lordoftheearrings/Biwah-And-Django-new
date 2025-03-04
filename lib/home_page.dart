@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return MessagesPage(username: widget.username);
       case 2:
-        return NotificationPage();
+        return NotificationPage(username: widget.username);
       case 3:
         return ProfilePage(username: widget.username);
       default:
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SetPreferencePage()),
+                MaterialPageRoute(builder: (context) => SetPreferencePage(username: widget.username)),
               );
             },
           ),
@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchPage()),
+                MaterialPageRoute(builder: (context) => SearchPage(username:widget.username)),
               );
             },
           ),
@@ -232,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        ViewUser(username: profile['username']),
+                        ViewUser(username: profile['username'],currentUsername:widget.username),
                   ),
                 );
               }
@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  ViewUser(username: profile['username']),
+                                  ViewUser(username: profile['username'],currentUsername:widget.username),
                             ),
                           );
                         },

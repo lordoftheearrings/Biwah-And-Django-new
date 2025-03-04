@@ -4,6 +4,11 @@ import 'api_service.dart';
 import 'view_user.dart';
 
 class SearchPage extends StatefulWidget {
+
+  final String username; // Add a username parameter
+
+  SearchPage({required this.username});
+
   @override
   _SearchPageState createState() => _SearchPageState();
 }
@@ -126,7 +131,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _navigateToViewUserPage(dynamic user) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ViewUser(username: user['username'])));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ViewUser(username: user['username'],currentUsername: widget.username,)));
   }
 
   @override

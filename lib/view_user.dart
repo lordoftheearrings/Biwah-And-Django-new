@@ -4,8 +4,9 @@ import 'custom_snackbar.dart';
 
 class ViewUser extends StatefulWidget {
   final String username;
+  final String currentUsername;
 
-  ViewUser({required this.username});
+  ViewUser({required this.username,required this.currentUsername});
 
   @override
   _ViewUserState createState() => _ViewUserState();
@@ -97,7 +98,7 @@ class _ViewUserState extends State<ViewUser> {
                                   ),
                                   onPressed: () async {
                                     if (!isMatchSent) {
-                                      var response = await _apiService.sendMatchRequest(widget.username, profileData['username']);
+                                      var response = await _apiService.sendMatchRequest(widget.currentUsername, profileData['username']);
                                       if (response != null && response['message'] == 'Match request sent successfully.') {
                                         setState(() {
                                           isMatchSent = true;
@@ -282,7 +283,7 @@ class _ViewUserState extends State<ViewUser> {
           Text(
             value,
             style: TextStyle(
-              fontFamily: 'CustomFont2',
+
               fontSize: 14,
               color: Colors.white,
             ),
