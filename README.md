@@ -1,16 +1,26 @@
-# biwah
+# 🕊️ Biwah Bandhan – Matrimonial App (Frontend)
 
-A new Flutter project.
+**Biwah Bandhan** is a modern Flutter-based matrimonial application designed to help individuals find compatible life partners through a personalized and user-friendly experience. This repository contains the complete frontend codebase for the Biwah Bandhan mobile application.
 
-## Getting Started
+## 🚀 Overview
 
-This project is a starting point for a Flutter application.
+The Biwah Bandhan app provides a seamless and intuitive interface to explore user profiles, send match requests, and communicate with potential partners. Key features include:
 
-A few resources to get you started if this is your first Flutter project:
+- 🔍 Advanced profile search and filters (age, religion, caste, etc.)
+- 📱 TikTok-style infinite profile feed
+- 💬 In-app chat and calling functionality (under development)
+- 🔐 Secure user authentication
+- 🧾 Kundali generation and compatibility matching
+- ✏️ Editable user profiles and preferences
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+This frontend is built using **Flutter**, and it connects to a **Django** backend and **PostgreSQL** database.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Technologies Used
+
+- Flutter (Dart)
+- Django (Backend)
+- PostgreSQL (Database)
+- REST API
+- flutter_svg for SVG rendering
+
+
