@@ -31,11 +31,11 @@ class _ChatPageState extends State<ChatPage> {
     // Connect to WebSocket
     if (kIsWeb) {
       channel = WebSocketChannel.connect(
-        Uri.parse('ws://127.0.0.1:8000/ws/chat/${widget.roomName}/'), // Replace with actual URL
+        Uri.parse('ws://8338-202-166-217-216.ngrok-free.app/ws/chat/${widget.roomName}/'), // Replace with actual URL
       );
     } else {
       channel = IOWebSocketChannel.connect(
-        'ws://127.0.0.1:8000/ws/chat/${widget.roomName}/', // Replace with actual URL
+        'ws://8338-202-166-217-216.ngrok-free.app/ws/chat/${widget.roomName}/', // Replace with actual URL
       );
     }
 

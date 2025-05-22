@@ -25,7 +25,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
     _logoSizeAnimation = Tween<double>(begin: 200, end: 260).animate(_controller);

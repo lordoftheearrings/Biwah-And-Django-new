@@ -3,7 +3,7 @@ import 'dart:io'; // For handling files
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://127.0.0.1:8000';
+  final String baseUrl = 'https://8338-202-166-217-216.ngrok-free.app';
 
   // Register User
   Future<void> registerUser(String username, String password) async {

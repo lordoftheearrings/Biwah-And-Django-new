@@ -117,6 +117,7 @@
 
 import 'package:flutter/material.dart';
 import 'api_service.dart';
+import 'custom_snackbar.dart';
 
 class WeightPreferencePage extends StatefulWidget {
   final String username;
@@ -255,14 +256,12 @@ class _WeightPreferencePageState extends State<WeightPreferencePage> {
           bool success = await ApiService().saveWeights(widget.username, weightsData);
 
           // Show feedback
+
           if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Weights saved successfully!")),
-            );
+            CustomSnackbar.showSuccess(context, "Weights saved successfully!");
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Failed to save weights. Please try again.")),
-            );
+
+            CustomSnackbar.showError(context,"Failed to save weights. Please try again.");
           }
         },
         child: Icon(Icons.save,color: Colors.white), // Icon for the FloatingActionButton

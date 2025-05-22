@@ -193,8 +193,7 @@ class _NotificationPageState extends State<NotificationPage> {
       _currentNotifications = newNotifications;
     });
 
-    // Handle tap on system notification
-    _configureSelectNotification();
+
   }
 
   @override
@@ -216,23 +215,10 @@ class _NotificationPageState extends State<NotificationPage> {
       android: androidPlatformChannelSpecifics,
     );
 
-    await flutterLocalNotificationsPlugin.show(
-      0, title, body, platformChannelSpecifics,
-      payload: body, // Pass the message as payload for tap detection
-    );
+
   }
 
-  // Handle notification tap (from system tray)
-  void _configureSelectNotification() {
-    flutterLocalNotificationsPlugin.initialize(
-      InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')),
-      onSelectNotification: (String? payload) async {
-        if (payload != null && payload.toLowerCase().contains('match request')) {
-          _navigateToMatchesPage();
-        }
-      },
-    );
-  }
+
 
   // Navigate to MatchesPage
   void _navigateToMatchesPage() {

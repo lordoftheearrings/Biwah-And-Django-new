@@ -4,21 +4,10 @@ import 'signup_page.dart';
 import 'home_page.dart';
 import 'complete_profile_page.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-
-  final InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+void main()  {
   runApp(MyApp());
 }
 
@@ -63,8 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromRGBO(110, 0, 121, 1.0), Color.fromRGBO(
-                253, 76, 173, 1.0)], // Gradient background
+            colors: [Colors.blueAccent,Colors.purple], // Gradient background
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

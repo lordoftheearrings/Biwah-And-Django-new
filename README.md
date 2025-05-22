@@ -23,4 +23,32 @@ This frontend is built using **Flutter**, and it connects to a **Django** backen
 - REST API
 - flutter_svg for SVG rendering
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td><img src="assets/screenshots/Picture2.jpg" width="300"/></td>
+    <td><img src="assets/screenshots/Picture3.jpg" width="300"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Picture12.jpg" width="300"/></td>
+    <td><img src="assets/screenshots/Picture5.jpg" width="300"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Picture6.png" width="300"/></td>
+    <td><img src="assets/screenshots/Picture7.jpg" width="300"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Picture8.jpg" width="300"/></td>
+    <td><img src="assets/screenshots/Picture9.jpg" width="300"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Picture10.jpg" width="300"/></td>
+    <td><img src="assets/screenshots/Picture11.jpg" width="300"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Picture4.png" width="500"/></td>
+  </tr>
+</table>
+
 

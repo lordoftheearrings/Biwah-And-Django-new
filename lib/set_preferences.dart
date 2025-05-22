@@ -233,6 +233,7 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart'; // Importing the ApiService
 import 'weight_preference.dart'; // Importing weight preference page
+import 'custom_snackbar.dart';
 
 class SetPreferencePage extends StatefulWidget {
   final String username;
@@ -403,13 +404,10 @@ class _SetPreferencePageState extends State<SetPreferencePage> {
 
           // Show feedback
           if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Preferences saved successfully!")),
-            );
+            CustomSnackbar.showSuccess(context, "Preferences saved successfully!");
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Failed to save preferences. Please try again.")),
-            );
+
+            CustomSnackbar.showError(context,"Failed to save preferences. Please try again.");
           }
         },
         child: Icon(Icons.save,color: Colors.white,),
